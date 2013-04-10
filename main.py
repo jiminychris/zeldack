@@ -6,6 +6,7 @@ from Actor import Actor
 from Utils import *
 from Spritesheet import Spritesheet
 import random
+import Text
   
 SCREENW=256
 SCREENH=240
@@ -16,6 +17,9 @@ ZOOM=2
 FPS=60.0
 TICK=1.0/FPS
 
+class DATA(object):
+  pass
+
 def main():
   quit = False
   random.seed()
@@ -24,17 +28,16 @@ def main():
   screen = pygame.display.set_mode(size)
   
   tiles, monsters = parse('first.map')
+  DATA.lifetxt = Text.get('-LIFE-', (255,0,0))
   walls = [aabb for tile in tiles for aabb in tile.AABBs]
   #imgs = [pygame.image.load(tile.img) for tile in tiles]
   
   
-  #ss = Spritesheet('link.bmp')
-  ss = Spritesheet('octorok.bmp')
+  ss = Spritesheet('link.bmp')
   s = {}
-  s[Direction.UP] = ss.images_at(((0,0,16,16),(0,16,16,16)), colorkey=(255,0,255))
-  #s[Direction.UP] = ss.images_at(((16,0,16,16),(16,16,16,16)), colorkey=(255,0,255))
-  #s[Direction.DOWN] = ss.images_at(((0,0,16,16),(0,16,16,16)), colorkey=(255,0,255))
-  #s[Direction.LEFT] = ss.images_at(((32,0,16,16),(32,16,16,16)), colorkey=(255,0,255))
+  s[Direction.UP] = ss.images_at(((16,0,16,16),(16,16,16,16)), colorkey=(255,0,255))
+  s[Direction.DOWN] = ss.images_at(((0,0,16,16),(0,16,16,16)), colorkey=(255,0,255))
+  s[Direction.LEFT] = ss.images_at(((32,0,16,16),(32,16,16,16)), colorkey=(255,0,255))
   pc = Actor(100,100,2,s)
   
   actors = [pc] + monsters
@@ -53,11 +56,9 @@ def update(pc, walls, monsters):
   
 def render(screen, actors, tiles, zoom):
   screen.fill((0,0,0))
-  """border = pygame.Surface((8*16*2*zoom,8*15*2*zoom))
-  border.fill((255,255,0))
-  tile = pygame.Surface((6*zoom,6*zoom))
-  tile.fill((50,50,50))
-  screen.blit(border,(0,0))"""
+  lifetxt = DATA.lifetxt
+  for i in range(len(lifetxt)):
+    screen.blit(pygame.transform.scale(lifetxt[i], (lifetxt[i].get_width()*zoom, lifetxt[i].get_height()*zoom)), ((24+i)*8*zoom, 16*zoom))
   for tile in tiles:
     screen.blit(pygame.transform.scale(tile.img, (Tile.SIZE*zoom, Tile.SIZE*zoom)), ((tile.x)*zoom, (tile.y+OFFSET)*zoom))
   for actor in actors:
