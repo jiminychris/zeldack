@@ -1,0 +1,27 @@
+<monsters>
+  <octorok>
+    <sprites sheet="octorok.bmp">
+      <up>
+        <sprite x="0" y="0" w="16" h="16" />
+        <sprite x="0" y="16" w="16" h="16" />
+        <colorkey r="255" g="0" b="255" />
+      </up>
+    </sprites>
+    <hp>
+      8
+    </hp>
+    <attack>
+      8
+    </attack>
+    <ai>
+      <movement>
+        <speed>
+          <option>1</option>
+          <option>2</option>
+          <option>4</option>
+        </speed>
+        <pattern>random</pattern>
+      </movement>
+    </ai>
+  </octorok>
+</monsters>
