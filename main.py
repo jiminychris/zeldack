@@ -54,7 +54,7 @@ class Main(object):
     s[Direction.UP] = ss.images_at(((16,0,16,16),(16,16,16,16)), colorkey=(255,0,255))
     s[Direction.DOWN] = ss.images_at(((0,0,16,16),(0,16,16,16)), colorkey=(255,0,255))
     s[Direction.LEFT] = ss.images_at(((32,0,16,16),(32,16,16,16)), colorkey=(255,0,255))
-    self._pc = Actor(15*8,11*8,2,s,16*16,8)
+    self._pc = Actor(15*8,11*8,2,s,12*16,8)
     
     self._actors = [self._pc] + self._monsters
     
