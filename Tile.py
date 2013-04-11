@@ -4,10 +4,13 @@ SIZE = 16
 HALF = SIZE/2
 
 class Tile(object):
-  def __init__(self, x, y, img, AABBs):
+  def __init__(self, x, y, img, AABBs, portal=None):
     self._x = x * SIZE
     self._y = y * SIZE
-    self._img = pygame.image.load(img)
+    self._img = img
+    self._portal = portal
+    if AABBs is None:
+      AABBs = ()
     self._AABBs = map(lambda x: pygame.Rect(x.x*HALF+self._x, x.y*HALF+self._y, x.w*HALF, x.h*HALF), AABBs)
     
   @property
@@ -17,6 +20,14 @@ class Tile(object):
   @property
   def y(self):
     return self._y
+    
+  @property
+  def isPortal(self):
+    return self._portal is not None
+    
+  @property
+  def portal(self):
+    return self._portal
     
   @property
   def img(self):

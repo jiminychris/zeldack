@@ -3,6 +3,7 @@ from Spritesheet import Spritesheet
 from Utils import colorReplace
 
 WHITE = (255,255,255)
+BLACK = (0,0,0)
 TEXT = None
 
 def get(txt, color=None):
@@ -22,4 +23,4 @@ def initialize():
     row = rows[j]
     for i in range(len(row)):
       l = row[i]
-      TEXT[l] = ss.image_at((i*8,j*8,8,8), colorkey=(255,0,255))
+      TEXT[l] = ss.image_at((i*8,j*8,8,8), colorkey=BLACK)

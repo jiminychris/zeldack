@@ -16,6 +16,12 @@ class Main(object):
     self._MAPW=256
     self._MAPH=176
     self._OFFSET=self._SCREENH-self._MAPH
+    
+    self._UBOUND = pygame.Rect(0, -16, self._MAPW, 16)
+    self._RBOUND = pygame.Rect(self._MAPW, 0, 16, self._MAPH)
+    self._BBOUND = pygame.Rect(0, self._MAPH, self._MAPW, 16)
+    self._LBOUND = pygame.Rect(-16, 0, 16, self._MAPH)
+    
     self._FPS=60.0
     self._TICK=1.0/self._FPS
     
@@ -25,7 +31,6 @@ class Main(object):
     size = width, height = self._SCREENW*self._zoom, self._SCREENH*self._zoom
     self._screen = pygame.display.set_mode(size)
     
-    self._tiles, self._monsters = parse('first.map')
     self._lifetxt = Text.get('-LIFE-', (255,0,0))
     self._btxt = Text.get('X')[0]
     self._atxt = Text.get('Z')[0]
@@ -45,9 +50,6 @@ class Main(object):
     
     self._uirupee, self._uikey, self._uibomb = iss.images_at(((0,16,8,8), (8,16,8,8), (16,16,8,8)), colorkey=(255,0,255))
     
-    self._walls = [aabb for tile in self._tiles for aabb in tile.AABBs]
-    #imgs = [pygame.image.load(tile.img) for tile in self._tiles]
-    
     
     ss = Spritesheet('link.bmp')
     s = {}
@@ -55,9 +57,12 @@ class Main(object):
     s[Direction.DOWN] = ss.images_at(((0,0,16,16),(0,16,16,16)), colorkey=(255,0,255))
     s[Direction.LEFT] = ss.images_at(((32,0,16,16),(32,16,16,16)), colorkey=(255,0,255))
     self._pc = Actor(15*8,11*8,2,s,12*16,8)
+    self._loadmap('first.map')
     
+    
+  def _loadmap(self, m):
+    self._tiles, self._monsters, self._decos, self._portals = parse(m)
     self._actors = [self._pc] + self._monsters
-    
     
   def setzoom(self, val):
     self._zoom = val
@@ -74,7 +79,7 @@ class Main(object):
         self._render()
     
   def _update(self):
-    [actor.update() for actor in self._actors]
+    [updater.update() for updater in self._actors+self._decos]
     self._input()
     self._physics()
     
@@ -83,6 +88,8 @@ class Main(object):
     
     for tile in self._tiles:
       self._screen.blit(pygame.transform.scale(tile.img, (Tile.SIZE*self._zoom, Tile.SIZE*self._zoom)), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
+    for deco in self._decos:
+      self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))
     for actor in self._actors:
       sprite = actor.sprite
       self._screen.blit(pygame.transform.scale(sprite, (sprite.get_width()*self._zoom, sprite.get_height()*self._zoom)), ((actor.x+actor.xoffset)*self._zoom, (actor.y+self._OFFSET+actor.yoffset)*self._zoom))
@@ -217,29 +224,41 @@ class Main(object):
           
   def _physics(self):
     for actor in self._actors:
-      if actor.x <= 0:
-        actor.x = 0
-      if actor.y <= 0:
-        actor.y = 0
-      if actor.x+16 >= self._MAPW:
-        actor.x = self._MAPW-16
-      if actor.y+16 >= self._MAPH:
-        actor.y = self._MAPH-16
+      p = None
+      if actor.aabb.colliderect(self._UBOUND):
+        p = self._portals[Direction.UP]
+        actor.y = self._UBOUND.y+self._UBOUND.h
+      if actor.aabb.colliderect(self._RBOUND):
+        p = self._portals[Direction.RIGHT]
+        actor.x = self._RBOUND.x-actor.aabb.w
+      if actor.aabb.colliderect(self._BBOUND):
+        p = self._portals[Direction.DOWN]
+        actor.y = self._BBOUND.y-actor.aabb.h
+      if actor.aabb.colliderect(self._LBOUND):
+        p = self._portals[Direction.LEFT]
+        actor.x = self._LBOUND.x+self._LBOUND.w
+      if p is not None:
+        return self._port(p)
         
       actor.x += actor.dx
-      for wall in self._walls:
-        if actor.aabb.colliderect(wall):
-          if actor.dx < 0:
-            actor.x = wall.x+wall.w
-          else:
-            actor.x = wall.x-actor.aabb.w
+      for tile in self._tiles:
+        for wall in tile.AABBs:
+          if actor.aabb.colliderect(wall):
+            if actor.dx < 0:
+              actor.x = wall.x+wall.w
+            else:
+              actor.x = wall.x-actor.aabb.w
       actor.y += actor.dy
-      for wall in self._walls:
-        if actor.aabb.colliderect(wall):
-          if actor.dy < 0:
-            actor.y = wall.y+wall.h
-          else:
-            actor.y = wall.y-actor.aabb.h
+      for tile in self._tiles:
+        for wall in tile.AABBs:
+          if actor.aabb.colliderect(wall):
+            if actor == self._pc and tile.isPortal:
+              return self._port(tile.portal)
+            else:
+              if actor.dy < 0:
+                actor.y = wall.y+wall.h
+              else:
+                actor.y = wall.y-actor.aabb.h
     
     if self._pc.isControllable:    
       self._pc.dx = 0
@@ -260,6 +279,10 @@ class Main(object):
         if self._pc.direction == Direction.RIGHT:
           self._pc.dx = -speed
           
-          
+  def _port(self, portal):
+    self._loadmap(portal.destfile)
+    self._pc.x = portal.destx
+    self._pc.y = portal.desty  
+    
 if __name__ == '__main__':
   Main().main()
