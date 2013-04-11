@@ -3,16 +3,21 @@ import pygame
 from Utils import *
 
 class Actor(object):
-  def __init__(self, x, y, speed, sprites, ai=None):
+  def __init__(self, x, y, speed, sprites, hp, attack, ai=None):
     self._x = x
     self._y = y
     self._dx = 0
     self._dy = 0
+    self._hp = hp
+    self._maxhp = hp
+    self._attack = attack
     self._speed = speed
     self._xoffset = 0
     self._yoffset = -Tile.HALF
     self._frame = 0
     self._anim = 0
+    self._lctimer = 0
+    self._invtimer = 0
     self._ai = ai
     self._sprites = sprites
     if sprites is None or Direction.UP not in sprites.keys():
@@ -24,6 +29,51 @@ class Actor(object):
     if Direction.RIGHT not in sprites.keys():
       self._sprites[Direction.RIGHT] = map(lambda s: pygame.transform.flip(s, True, False), self._sprites[Direction.LEFT])
     self.direction = Direction.DOWN
+    
+  def update(self):
+    if self._invtimer > 0:
+      self._invtimer -= 1
+    if self._lctimer > 0: 
+      self._lctimer -= 1
+    
+  def becomeInvincible(self, t):
+    self._invtimer = t  
+  @property
+  def isInvincible(self):
+    return self._invtimer 
+    
+  def loseControl(self, t):
+    self._lctimer = t  
+  @property
+  def isControllable(self):
+    return not self._lctimer 
+  
+  @property
+  def hp(self):
+    return self._hp
+    
+  def heal(self, value):
+    if value < 0:
+      raise ValueError("Expected positive number")
+    self._hp += value
+    if self._hp > self._maxhp:
+      self._hp = self._maxhp
+      
+  @property
+  def attack(self):
+    return self._attack
+    
+  def hurt(self, value):
+    if value < 0:
+      raise ValueError("Expected positive number")
+    self._hp -= value
+    if self._hp < 0:
+      self._hp = 0
+    
+  @property
+  def maxhp(self):
+    return self._maxhp
+    
     
   @property
   def x(self):

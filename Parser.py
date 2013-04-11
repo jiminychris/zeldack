@@ -35,6 +35,18 @@ def parse(fname):
     if m is None:
       raise ValueError('could not find monster with id \''+id+'\' in '+str(monroots))
       
+    hp = m.find('hp')
+    if hp is None:
+      hp = 8
+    else:
+      hp = int(hp.text)
+      
+    atk = m.find('attack')
+    if atk is None:
+      atk = 8
+    else:
+      atk = int(atk.text)
+      
     pattern = None
     speed = 0
     aimov = m.find('ai')
@@ -50,7 +62,7 @@ def parse(fname):
         speed = int(options[random.randint(0,len(options)-1)].text)
     if pattern is not None:
       pattern = pattern.text
-    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, _sprites(m), pattern))
+    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, _sprites(m), hp, atk, pattern))
       
   return tilelist, monsterlist
   
@@ -67,7 +79,10 @@ def _sprites(node):
          (Direction.DOWN, s.find('down')), 
          (Direction.LEFT, s.find('left')), 
          (Direction.RIGHT, s.find('right')))
-  
+         
+  repl = s.find('colors')
+  if repl is not None:
+    repl = [[_parsecolor(c) for c in r.findall('color')] for r in repl.findall('replace')]
   if udlr[0][1] is None:
     raise ValueError('Cannot do sprite without an UP direction')
     
@@ -79,11 +94,14 @@ def _sprites(node):
       slices = [[int(a) for a in (s.get('x','0'), s.get('y', '0'), s.get('w', '16'), s.get('h', '16'))] for s in xml.findall('sprite')]
       ck = xml.find('colorkey')
       if ck is not None:
-        ck = [int(a) for a in (ck.get('r', '0'), ck.get('g', '0'), ck.get('b', '0'))]
-      sd[dir] = ss.images_at(slices, colorkey=ck)
+        ck = _parsecolor(ck.find('color'))
+      imgs = ss.images_at(slices, colorkey=ck)
+      sd[dir] = imgs if repl is None else [colorReplace(img, repl) for img in imgs]
       
   return sd
   
+def _parsecolor(node):
+  return (int(node.get('r', '0')), int(node.get('g', '0')), int(node.get('b', '0')))
   
 def _safeopen(fname):
   if not isinstance(fname, str):

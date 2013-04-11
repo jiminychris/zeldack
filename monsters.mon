@@ -4,7 +4,9 @@
       <up>
         <sprite x="0" y="0" w="16" h="16" />
         <sprite x="0" y="16" w="16" h="16" />
-        <colorkey r="255" g="0" b="255" />
+        <colorkey>
+          <color r="255" g="0" b="255" />
+        </colorkey>
       </up>
     </sprites>
     <hp>
@@ -18,10 +20,45 @@
         <speed>
           <option>1</option>
           <option>2</option>
-          <option>4</option>
         </speed>
         <pattern>random</pattern>
       </movement>
     </ai>
   </octorok>
+  <boctorok>
+    <sprites sheet="octorok.bmp">
+      <up>
+        <sprite x="0" y="0" w="16" h="16" />
+        <sprite x="0" y="16" w="16" h="16" />
+        <colorkey>
+          <color r="255" g="0" b="255" />
+        </colorkey>
+      </up>
+      <colors>
+        <replace>
+          <color r="255" g="0" b="0" />
+          <color r="0" g="0" b="255" />
+        </replace>
+        <replace>
+          <color r="255" g="160" b="68" />
+          <color r="190" g="231" b="241" />
+        </replace>
+      </colors>
+    </sprites>
+    <hp>
+      16
+    </hp>
+    <attack>
+      8
+    </attack>
+    <ai>
+      <movement>
+        <speed>
+          <option>1</option>
+          <option>2</option>
+        </speed>
+        <pattern>random</pattern>
+      </movement>
+    </ai>
+  </boctorok>
 </monsters>

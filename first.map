@@ -204,5 +204,6 @@
   </tiles>
   <monsters>
     <monster id="octorok" x="128" y="128" />
+    <monster id="boctorok" x="144" y="136" />
   </monsters>
 </map>
