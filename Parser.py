@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as et
-from Tile import Tile
+import Tile
 from Portal import Portal
+import Text
 from pygame.rect import Rect
 from Actor import Actor
 from Spritesheet import Spritesheet
@@ -11,7 +12,7 @@ from Utils import *
 _DEFAULTCOLORS = ((0,0,0),(128,128,128),(192,192,192),(255,255,255))
 _DIRECTIONS = (Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT)
 
-def parse(fname):
+def parse(fname, main):
   random.seed()
   tree = _safeopen(fname)
   
@@ -19,9 +20,13 @@ def parse(fname):
   monsterlist = []
   decolist = []
   portals = {}
+  textlist = []
   
   
   root = tree.getroot()
+  textnode = root.find('text')
+  if textnode is not None:
+    textlist = [tile for line in textnode.findall('line') for tile in _parseline(line)]
   tiledefs = {}
   aabbdefs = {}
   portdefs = {}
@@ -33,7 +38,7 @@ def parse(fname):
   dn = root.find('decorations')
   if dn is not None:
     dss = Spritesheet(dn.get('file', None))
-    [decodefs.update(((d.get('type', 'blank'), ([colorReplace(s, zip(_DEFAULTCOLORS, _parsecolors(d.find('palette')))) for s in dss.images_at(_parsesprites(d))], d.get('animtype', 'fliph'))),)) for d in dn.findall('def')]
+    [decodefs.update(((d.get('type', 'blank'), ([colorReplace(s, zip(_DEFAULTCOLORS, _parsecolors(d.find('palette')))) for s in dss.images_at(_parsesprites(d), _tryparsecolorkey(d))], d.get('animtype', 'fliph'))),)) for d in dn.findall('def')]
     [decolist.append(Decoration(int(d.get('x', '0')), int(d.get('y', '0')), decodefs[d.get('type', 'blank')][0], decodefs[d.get('type', 'blank')][1])) for d in dn.findall('decoration')]
   tn = root.find('tiles')
   pn = tn.find('palette')
@@ -57,7 +62,7 @@ def parse(fname):
     tiles = rows[j].findall('tile')
     for i in range(len(tiles)):
       t = tiles[i].get('type', 'blank')
-      tilelist.append(Tile(i, j, tiledefs[t], aabbdefs[t], portdefs[t]))
+      tilelist.append(Tile.Tile(i, j, tiledefs[t], aabbdefs[t], portdefs[t]))
       
   for monster in monsters:
     id = monster.get('id', 'octorok')
@@ -93,9 +98,9 @@ def parse(fname):
         speed = int(options[random.randint(0,len(options)-1)].text)
     if pattern is not None:
       pattern = pattern.text
-    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, _sprites(m), hp, atk, pattern))
+    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, hp, atk, pygame.Rect(0, 0, Tile.SIZE, Tile.HALF), _sprites(m), None, pattern))
       
-  return tilelist, monsterlist, decolist, portals
+  return tilelist, monsterlist, decolist, portals, textlist
   
 def _sprites(node):
   s = node.find('sprites')
@@ -148,6 +153,21 @@ def _parseport(node):
   if port is not None:
     port = Portal(port.get('file', 'swordcave.map'), int(port.get('x', '0')), int(port.get('y', '0')))
   return port
+def _tryparsecolorkey(node):
+  if node is None:
+    return None
+  ck = node.find('colorkey')
+  if ck is None:
+    return None
+  return _parsecolor(ck.find('color'))
+def _parseline(node):
+  x = int(node.get('x', '0'))
+  y = int(node.get('y', '0'))
+  txt = Text.get(node.get('value', ''))
+  tiles = []
+  for i in range(len(txt)):
+    tiles.append(Tile.Tile(x+i*8, y, txt[i], size=1))
+  return tiles
   
 def _safeopen(fname):
   if not isinstance(fname, str):

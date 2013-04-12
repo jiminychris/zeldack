@@ -3,7 +3,7 @@ import pygame
 from Utils import *
 
 class Actor(object):
-  def __init__(self, x, y, speed, sprites, hp, attack, ai=None):
+  def __init__(self, x, y, speed, hp, attack, aabb, sprites=None, atksprites=None, ai=None):
     self._x = x
     self._y = y
     self._dx = 0
@@ -11,42 +11,89 @@ class Actor(object):
     self._hp = hp
     self._maxhp = hp
     self._attack = attack
+    self._atktimer = 0
+    self._aabb = aabb
+    self._canAttack = True
     self._speed = speed
-    self._xoffset = 0
-    self._yoffset = -Tile.HALF
+    self._XOFFSET = self._xoffset = 0
+    self._YOFFSET = self._yoffset = -Tile.HALF
     self._frame = 0
     self._anim = 0
     self._lctimer = 0
     self._invtimer = 0
     self._ai = ai
     self._sprites = sprites
-    if sprites is None or Direction.UP not in sprites.keys():
-      raise ValueError('Expected at least UP sprite in dict')
-    if Direction.DOWN not in sprites.keys():
-      self._sprites[Direction.DOWN] = map(lambda s: pygame.transform.flip(s, False, True), sprites[Direction.UP])
-    if Direction.LEFT not in sprites.keys():
-      self._sprites[Direction.LEFT] = map(lambda s: pygame.transform.rotate(s, 90), sprites[Direction.UP])
-    if Direction.RIGHT not in sprites.keys():
-      self._sprites[Direction.RIGHT] = map(lambda s: pygame.transform.flip(s, True, False), self._sprites[Direction.LEFT])
+    self._atksprites = atksprites
+    if sprites is not None: 
+      if Direction.UP not in sprites.keys():
+        raise ValueError('Expected at least UP sprite in dict')
+      if Direction.DOWN not in sprites.keys():
+        self._sprites[Direction.DOWN] = map(lambda s: pygame.transform.flip(s, False, True), sprites[Direction.UP])
+      if Direction.LEFT not in sprites.keys():
+        self._sprites[Direction.LEFT] = map(lambda s: pygame.transform.rotate(s, 90), sprites[Direction.UP])
+      if Direction.RIGHT not in sprites.keys():
+        self._sprites[Direction.RIGHT] = map(lambda s: pygame.transform.flip(s, True, False), self._sprites[Direction.LEFT])
+    if atksprites is not None:
+      if Direction.UP not in atksprites.keys():
+        raise ValueError('Expected at least UP sprite in dict')
+      if Direction.DOWN not in atksprites.keys():
+        self._atksprites[Direction.DOWN] = pygame.transform.flip(atksprites[Direction.UP], False, True)
+      if Direction.LEFT not in atksprites.keys():
+        self._atksprites[Direction.LEFT] = pygame.transform.rotate(atksprites[Direction.UP], 90)
+      if Direction.RIGHT not in atksprites.keys():
+        self._atksprites[Direction.RIGHT] = pygame.transform.flip(self._atksprites[Direction.LEFT], True, False)
+    
     self.direction = Direction.DOWN
     
   def update(self):
+    if self._atktimer > 0:
+      self._atktimer -= 1
+      if self._atktimer == 0:
+        self._xoffset = self._XOFFSET
+        self._yoffset = self._YOFFSET
     if self._invtimer > 0:
       self._invtimer -= 1
     if self._lctimer > 0: 
       self._lctimer -= 1
     
+  #def setoffsets(self, ox, oy):
+  #  self._xoffset = ox
+  #  self._yoffset = oy
+  
   def becomeInvincible(self, t):
     self._invtimer = t  
   @property
   def isInvincible(self):
-    return self._invtimer 
+    return self._invtimer != 0
     
   def loseControl(self, t):
     self._lctimer = t  
   @property
   def isControllable(self):
-    return not self._lctimer 
+    return not self._lctimer != 0
+  
+  def stop(self):
+    self._dx = 0
+    self._dy = 0    
+    
+  def doAttack(self, t):
+    if self._canAttack:
+      self._canAttack = False
+      os = self.sprite
+      self._atktimer = t
+      ns = self.sprite
+      if self.direction == Direction.LEFT:
+        self._xoffset -= ns.get_width() - os.get_width()
+      elif self.direction == Direction.UP:
+        self._yoffset -= ns.get_height() - os.get_height()
+  def releaseAttack(self):
+    self._canAttack = True
+  @property
+  def isAttacking(self):
+    return self._atktimer != 0
+  @property
+  def canAttack(self):
+    return self._canAttack
   
   @property
   def hp(self):
@@ -122,11 +169,15 @@ class Actor(object):
     
   @property
   def aabb(self):
-    return pygame.Rect(self._x, self._y, Tile.SIZE, Tile.HALF)
+    return pygame.Rect(self._aabb.x+self._x, self._aabb.y+self._y, self._aabb.w, self._aabb.h)
     
   @property
   def sprite(self):
-    return self._sprites[self.direction][self._anim]
+    if self.isAttacking and self._atksprites is not None:
+      sprite = self._atksprites[self.direction]
+    else:
+      sprite = self._sprites[self.direction][self._anim]
+    return sprite
     
   def incframe(self, value=1):
     self._frame += value

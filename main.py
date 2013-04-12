@@ -3,6 +3,7 @@ from Parser import parse
 import Tile
 import time
 from Actor import Actor
+from Inventory import Inventory
 from Utils import *
 from Spritesheet import Spritesheet
 import random
@@ -17,13 +18,17 @@ class Main(object):
     self._MAPH=176
     self._OFFSET=self._SCREENH-self._MAPH
     
-    self._UBOUND = pygame.Rect(0, -16, self._MAPW, 16)
-    self._RBOUND = pygame.Rect(self._MAPW, 0, 16, self._MAPH)
-    self._BBOUND = pygame.Rect(0, self._MAPH, self._MAPW, 16)
-    self._LBOUND = pygame.Rect(-16, 0, 16, self._MAPH)
+    self._UBOUND = pygame.Rect(0, 0, self._MAPW, 8)
+    self._RBOUND = pygame.Rect(self._MAPW, 0, 8, self._MAPH)
+    self._BBOUND = pygame.Rect(0, self._MAPH, self._MAPW, 8)
+    self._LBOUND = pygame.Rect(-8, 0, 8, self._MAPH)
+    
+    self._TEXTSPEED=4
     
     self._FPS=60.0
     self._TICK=1.0/self._FPS
+    
+    self._sword = None
     
     self._zoom = 2
     self._quit = False
@@ -36,33 +41,54 @@ class Main(object):
     self._atxt = Text.get('Z')[0]
     
     iss = Spritesheet('icons.bmp')
-    self._fullheart = iss.image_at((0,0,8,8), colorkey=(255,0,255))
-    self._halfheart = iss.image_at((8,0,8,8), colorkey=(255,0,255))
-    self._emptyheart = colorReplace(iss.image_at((0,0,8,8), colorkey=(255,0,255)), (((255,0,0), (255,227,171)),))
+    heart = iss.image_at((0,0,8,8), colorkey=(0,0,0))
+    self._fullheart = colorReplace(heart, (((128,128,128),(255,0,0)),))
+    self._halfheart = colorReplace(iss.image_at((8,0,8,8), colorkey=(0,0,0)), (((128,128,128),(255,0,0)),((255,255,255),(255,227,171))))
+    self._emptyheart = colorReplace(heart, (((128,128,128),(255,227,171)),))
     
     self._uibox = {}
-    self._uibox['ul'] = iss.image_at((0,8,8,8), colorkey=(255,0,255))
-    self._uibox['v'] = iss.image_at((8,8,8,8), colorkey=(255,0,255))
+    self._uibox['ul'] = colorReplace(iss.image_at((0,8,8,8), colorkey=(0,0,0)), (((128,128,128),(0,89,250)),))
+    self._uibox['v'] = colorReplace(iss.image_at((8,8,8,8), colorkey=(0,0,0)), (((128,128,128),(0,89,250)),))
     self._uibox['h'] = pygame.transform.rotate(self._uibox['v'], 90)
     self._uibox['ur'] = pygame.transform.flip(self._uibox['ul'], True, False)
     self._uibox['br'] = pygame.transform.flip(self._uibox['ur'], False, True)
     self._uibox['bl'] = pygame.transform.flip(self._uibox['ul'], False, True)
     
-    self._uirupee, self._uikey, self._uibomb = iss.images_at(((0,16,8,8), (8,16,8,8), (16,16,8,8)), colorkey=(255,0,255))
+    self._uirupee, self._uikey, self._uibomb = iss.images_at(((0,16,8,8), (8,16,8,8), (16,16,8,8)), colorkey=(0,0,0))
+    self._uirupee = colorReplace(self._uirupee, (((128,128,128),(255,161,68)),((255,255,255),(255,227,171))))
+    self._uikey = colorReplace(self._uikey, (((128,128,128),(255,161,68)),))
+    self._uibomb = colorReplace(self._uibomb, (((192,192,192),(0,89,250)),))
     
     
     ss = Spritesheet('link.bmp')
     s = {}
-    s[Direction.UP] = ss.images_at(((16,0,16,16),(16,16,16,16)), colorkey=(255,0,255))
-    s[Direction.DOWN] = ss.images_at(((0,0,16,16),(0,16,16,16)), colorkey=(255,0,255))
-    s[Direction.LEFT] = ss.images_at(((32,0,16,16),(32,16,16,16)), colorkey=(255,0,255))
-    self._pc = Actor(15*8,11*8,2,s,12*16,8)
+    s[Direction.UP] = [colorReplace(sp, (((0,0,0),(0,0,0)),((128,128,128),(200,76,12)),((192,192,192),(128,208,16)),((255,255,255),(252,152,56)))) for sp in ss.images_at(((16,0,16,16),(16,16,16,16)), colorkey=(0,0,0))]
+    s[Direction.DOWN] = [colorReplace(sp, (((0,0,0),(0,0,0)),((128,128,128),(200,76,12)),((192,192,192),(128,208,16)),((255,255,255),(252,152,56)))) for sp in ss.images_at(((0,0,16,16),(0,16,16,16)), colorkey=(0,0,0))]
+    s[Direction.LEFT] = [colorReplace(sp, (((0,0,0),(0,0,0)),((128,128,128),(200,76,12)),((192,192,192),(128,208,16)),((255,255,255),(252,152,56)))) for sp in ss.images_at(((32,0,16,16),(32,16,16,16)), colorkey=(0,0,0))]
+    atks = {}
+    atks[Direction.UP] = colorReplace(ss.image_at((64,0,16,32), colorkey=(0,0,0)), (((0,0,0),(0,0,0)),((128,128,128),(200,76,12)),((192,192,192),(128,208,16)),((255,255,255),(252,152,56))))
+    atks[Direction.DOWN] = colorReplace(ss.image_at((48,0,16,32), colorkey=(0,0,0)), (((0,0,0),(0,0,0)),((128,128,128),(200,76,12)),((192,192,192),(128,208,16)),((255,255,255),(252,152,56))))
+    atks[Direction.LEFT] = colorReplace(ss.image_at((48,32,32,16), colorkey=(0,0,0)), (((0,0,0),(0,0,0)),((128,128,128),(200,76,12)),((192,192,192),(128,208,16)),((255,255,255),(252,152,56))))
+    self._pc = Actor(15*8,11*8,2,3*16,8,pygame.Rect(0, 0, Tile.SIZE, Tile.HALF),s,atksprites=atks)
+    self._inventory = Inventory()
+    self._pcweapons = []
+    
     self._loadmap('first.map')
     
+  @property
+  def inventory(self):
+    return self._inventory
+    
+  @property
+  def actors(self):
+    return [self._pc] + self._monsters
     
   def _loadmap(self, m):
-    self._tiles, self._monsters, self._decos, self._portals = parse(m)
-    self._actors = [self._pc] + self._monsters
+    self._tiles, self._monsters, self._decos, self._portals, self._textlist = parse(m, self)
+    self._texttimer = 0
+    self._texttimermax = len(self._textlist)*self._TEXTSPEED
+    self._pc.stop()
+    self._pc.loseControl(self._texttimermax)
     
   def setzoom(self, val):
     self._zoom = val
@@ -77,9 +103,34 @@ class Main(object):
         nexttick += self._TICK
         self._update()
         self._render()
-    
+  
+  def _attacks(self):
+    if self._pc.isAttacking and self._sword is None:
+      atk = self._inventory.sword*8
+      w=3
+      l=11
+      if self._pc.direction == Direction.UP:
+        self._sword = Actor(self._pc.x+5, self._pc.y-9-l, 0,0,atk, pygame.Rect(0, 0, w, l))
+      if self._pc.direction == Direction.RIGHT:
+        self._sword = Actor(self._pc.x+16, self._pc.y, 0,0,atk, pygame.Rect(0, 0, l, w))
+      if self._pc.direction == Direction.DOWN:
+        self._sword = Actor(self._pc.x+7, self._pc.y+8, 0,0,atk, pygame.Rect(0, 0, w, l))
+      if self._pc.direction == Direction.LEFT:
+        self._sword = Actor(self._pc.x-l, self._pc.y, 0,0,atk, pygame.Rect(0, 0, l, w))
+      self._pcweapons.append(self._sword)
+    elif not self._pc.isAttacking and self._sword is not None:
+      self._pcweapons.remove(self._sword)
+      self._sword = None  
+  
+  def _deaths(self):
+    self._monsters = [monster for monster in self._monsters if monster.hp > 0]
+  
   def _update(self):
-    [updater.update() for updater in self._actors+self._decos]
+    self._attacks()
+    self._deaths()
+    [updater.update() for updater in self.actors+self._decos]
+    if self._texttimer < self._texttimermax:
+      self._texttimer += 1
     self._input()
     self._physics()
     
@@ -89,8 +140,10 @@ class Main(object):
     for tile in self._tiles:
       self._screen.blit(pygame.transform.scale(tile.img, (Tile.SIZE*self._zoom, Tile.SIZE*self._zoom)), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
     for deco in self._decos:
-      self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))
-    for actor in self._actors:
+      self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))   
+    for tile in self._textlist[:self._texttimer/self._TEXTSPEED]: 
+      self._screen.blit(self._getzoom(tile.img), (tile.x*self._zoom, (tile.y+self._OFFSET)*self._zoom))
+    for actor in self.actors:
       sprite = actor.sprite
       self._screen.blit(pygame.transform.scale(sprite, (sprite.get_width()*self._zoom, sprite.get_height()*self._zoom)), ((actor.x+actor.xoffset)*self._zoom, (actor.y+self._OFFSET+actor.yoffset)*self._zoom))
       
@@ -122,12 +175,15 @@ class Main(object):
     self._screen.blit(self._getzoom(self._uirupee), (11*8*self._zoom, 2*8*self._zoom))
     self._screen.blit(self._getzoom(self._uikey), (11*8*self._zoom, 4*8*self._zoom))
     self._screen.blit(self._getzoom(self._uibomb), (11*8*self._zoom, 5*8*self._zoom))
-    for i in range(4):
-      if i == 1:
-        continue
-      x0 = Text.get('X0')
-      for j in range(len(x0)):
-        self._screen.blit(self._getzoom(x0[j]), ((j+12)*8*self._zoom,(i+2)*8*self._zoom))
+    rupees = Text.get(('X' if self._inventory.rupees < 100 else '')+str(self._inventory.rupees))
+    for i in range(len(rupees)):
+      self._screen.blit(self._getzoom(rupees[i]), ((i+12)*8*self._zoom,(2)*8*self._zoom))
+    keys = Text.get('X'+str(self._inventory.keys))
+    for i in range(len(keys)):
+      self._screen.blit(self._getzoom(keys[i]), ((i+12)*8*self._zoom,(4)*8*self._zoom))
+    bombs = Text.get('X'+str(self._inventory.bombs))
+    for i in range(len(bombs)):
+      self._screen.blit(self._getzoom(bombs[i]), ((i+12)*8*self._zoom,(5)*8*self._zoom))
     maprect = pygame.Surface((8*8, 8*4))
     maprect.fill((100,100,100))
     self._screen.blit(self._getzoom(maprect), (2*8*self._zoom, 2*8*self._zoom))    
@@ -200,30 +256,41 @@ class Main(object):
             dy -= self._pc.speed
           elif self._pc.direction == Direction.DOWN:
             dy += self._pc.speed
-      self._pc.dx += dx
-      self._pc.dy += dy
+      self._pc.dx = dx
+      self._pc.dy = dy
+      
+      if keys[pygame.K_x]:
+        if self._pc.canAttack and self._inventory.sword > 0:
+          self._pc.doAttack(8)
+          self._pc.loseControl(8)
+          self._pc.stop()
+      else:
+        self._pc.releaseAttack()
+      
     for monster in self._monsters:
       monster.incframe()
-      if monster.ai == 'random':
-        if random.randint(1,20) == 20:
-          monster.dx = 0
-          monster.dy = 0
-          if (monster.dx != 0 and monster.x % 8 == 0) or (monster.dy != 0 and monster.y % 8 == 0) or (monster.dx == 0 and monster.dy == 0):
-            d = (None, Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)[random.randint(0,4)]
-            if d is not None:
-              monster.direction = d
-              if d == Direction.UP:
-                monster.dy -= monster.speed
-              if d == Direction.DOWN:
-                monster.dy += monster.speed
-              if d == Direction.LEFT:
-                monster.dx -= monster.speed
-              if d == Direction.RIGHT:
-                monster.dx += monster.speed
-        
+      if monster.isControllable:
+        if monster.ai == 'random':
+          if random.randint(1,20) == 20:
+            dx = 0
+            dy = 0
+            if (monster.dx != 0 and monster.x % 8 == 0) or (monster.dy != 0 and monster.y % 8 == 0) or (monster.dx == 0 and monster.dy == 0):
+              d = (None, Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)[random.randint(0,4)]
+              if d is not None:
+                monster.direction = d
+                if d == Direction.UP:
+                  dy -= monster.speed
+                if d == Direction.DOWN:
+                  dy += monster.speed
+                if d == Direction.LEFT:
+                  dx -= monster.speed
+                if d == Direction.RIGHT:
+                  dx += monster.speed
+            monster.dx = dx
+            monster.dy = dy
           
   def _physics(self):
-    for actor in self._actors:
+    for actor in self.actors:
       p = None
       if actor.aabb.colliderect(self._UBOUND):
         p = self._portals[Direction.UP]
@@ -259,27 +326,41 @@ class Main(object):
                 actor.y = wall.y+wall.h
               else:
                 actor.y = wall.y-actor.aabb.h
-    
-    if self._pc.isControllable:    
-      self._pc.dx = 0
-      self._pc.dy = 0
             
     for monster in self._monsters:
+      for weapon in self._pcweapons:
+        if monster.aabb.colliderect(weapon.aabb) and not monster.isInvincible:
+          monster.hurt(weapon.attack)
+          monster.becomeInvincible(30)
+          monster.loseControl(8)
+          monster.stop()
+          speed = self._pc.speed*2
+          if self._pc.direction == Direction.UP:
+            monster.dy = -speed
+          if self._pc.direction == Direction.DOWN:
+            monster.dy = speed
+          if self._pc.direction == Direction.LEFT:
+            monster.dx = -speed
+          if self._pc.direction == Direction.RIGHT:
+            monster.dx = speed
+          
       if self._pc.aabb.colliderect(monster.aabb) and not self._pc.isInvincible:
         self._pc.hurt(monster.attack)
         self._pc.becomeInvincible(30)
         self._pc.loseControl(8)
+        self._pc.stop()
         speed = self._pc.speed*2
-        if self._pc.direction == Direction.UP:
-          self._pc.dy = speed
-        if self._pc.direction == Direction.DOWN:
+        if monster.direction == Direction.UP:
           self._pc.dy = -speed
-        if self._pc.direction == Direction.LEFT:
-          self._pc.dx = speed
-        if self._pc.direction == Direction.RIGHT:
+        if monster.direction == Direction.DOWN:
+          self._pc.dy = speed
+        if monster.direction == Direction.LEFT:
           self._pc.dx = -speed
-          
+        if monster.direction == Direction.RIGHT:
+          self._pc.dx = speed
+        
   def _port(self, portal):
+    self._inventory.changesword(1)
     self._loadmap(portal.destfile)
     self._pc.x = portal.destx
     self._pc.y = portal.desty  

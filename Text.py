@@ -15,7 +15,7 @@ def initialize():
   rows = ('ABCDEFGHIJKLM',
           'NOPQRSTUVWXYZ',
           '0123456789',
-          '-.,!\'&')
+          '-.,!\'& ')
   ss = Spritesheet('text.bmp')
   global TEXT
   TEXT = {}

@@ -1,4 +1,8 @@
 <map>
+  <text>
+    <line x="48" y="40" value="IT'S DANGEROUS TO GO" />
+    <line x="64" y="48" value="ALONE! TAKE THIS." />
+  </text>
   <portals>
     <down>
       <portal file="first.map" x="64" y="24" />
@@ -228,6 +232,9 @@
   <decorations file="decos.bmp">
     <def type="fire" animtype="fliph">
       <sprite x="0" y="0" w="16" h="16" />
+      <colorkey>
+        <color r="0" g="0" b="0" />
+      </colorkey>
       <palette>
         <color r="0" g="0" b="0" />
         <color r="255" g="0" b="0" />

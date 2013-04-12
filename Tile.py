@@ -4,9 +4,11 @@ SIZE = 16
 HALF = SIZE/2
 
 class Tile(object):
-  def __init__(self, x, y, img, AABBs, portal=None):
-    self._x = x * SIZE
-    self._y = y * SIZE
+  def __init__(self, x, y, img, AABBs=None, portal=None, size=None):
+    if size is None:
+      size = SIZE
+    self._x = x * size
+    self._y = y * size
     self._img = img
     self._portal = portal
     if AABBs is None:
