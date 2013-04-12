@@ -276,8 +276,8 @@ class Play(object):
       
       if keys[pygame.K_x]:
         if self._pc.canAttack and self._inventory.sword > 0:
-          self._pc.doAttack(16)
-          self._pc.loseControl(16)
+          self._pc.doAttack(8)
+          self._pc.loseControl(8)
           self._pc.stop()
       else:
         self._pc.releaseAttack()
@@ -383,23 +383,28 @@ class Play(object):
     
 class Game(object):
   def __init__(self):
-    self._FPS=60.0
-    self._TICK=1.0/self._FPS
+    self._FPS=40
+    self._TICK=1000/self._FPS
     self._play = Play()
     self._quit = False
     
+    
   def main(self):
-    nexttick = time.time()+self._TICK
+    nexttick = millis()+self._TICK
+    save = 0
     while not self._quit:
-      for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-          self._quit = True
-          return
-      if time.time() >= nexttick:
-        nexttick += self._TICK
+      t = millis()
+      if t >= nexttick:
+        for event in pygame.event.get():
+          if event.type == pygame.QUIT:
+            self._quit = True
+            return
         self._play._update()
         self._play._render()
+        nexttick = t+self._TICK
   
-    
+def millis():  
+  return int(round(time.time()*1000))
+  
 if __name__ == '__main__':
   Game().main()
