@@ -19,3 +19,4 @@ def colorReplace(surf, swaps):
     
 
 Direction = enum("UP", "DOWN", "LEFT", "RIGHT")
+DIRECTIONS = Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT

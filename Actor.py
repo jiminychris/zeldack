@@ -3,7 +3,7 @@ import pygame
 from Utils import *
 
 class Actor(object):
-  def __init__(self, x, y, speed, hp, attack, aabb, sprites=None, atksprites=None, ai=None):
+  def __init__(self, x, y, speed, hp, attack, aabb, wallcollisions=True, sprites=None, atksprites=None, ai=None):
     self._x = x
     self._y = y
     self._dx = 0
@@ -15,6 +15,7 @@ class Actor(object):
     self._aabb = aabb
     self._canAttack = True
     self._speed = speed
+    self._wallcollisions = wallcollisions
     self._XOFFSET = self._xoffset = 0
     self._YOFFSET = self._yoffset = -Tile.HALF
     self._frame = 0
@@ -48,18 +49,19 @@ class Actor(object):
   def update(self):
     if self._atktimer > 0:
       self._atktimer -= 1
-      if self._atktimer == 0:
-        self._xoffset = self._XOFFSET
-        self._yoffset = self._YOFFSET
     if self._invtimer > 0:
       self._invtimer -= 1
     if self._lctimer > 0: 
       self._lctimer -= 1
     
-  #def setoffsets(self, ox, oy):
-  #  self._xoffset = ox
-  #  self._yoffset = oy
+  def setoffsets(self, ox, oy):
+    self._xoffset = ox
+    self._yoffset = oy
   
+  @property
+  def wallcollisions(self):
+    return self._wallcollisions
+    
   def becomeInvincible(self, t):
     self._invtimer = t  
   @property
@@ -82,10 +84,6 @@ class Actor(object):
       os = self.sprite
       self._atktimer = t
       ns = self.sprite
-      if self.direction == Direction.LEFT:
-        self._xoffset -= ns.get_width() - os.get_width()
-      elif self.direction == Direction.UP:
-        self._yoffset -= ns.get_height() - os.get_height()
   def releaseAttack(self):
     self._canAttack = True
   @property

@@ -98,7 +98,7 @@ def parse(fname, main):
         speed = int(options[random.randint(0,len(options)-1)].text)
     if pattern is not None:
       pattern = pattern.text
-    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, hp, atk, pygame.Rect(0, 0, Tile.SIZE, Tile.HALF), _sprites(m), None, pattern))
+    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, hp, atk, pygame.Rect(0, 0, Tile.SIZE, Tile.HALF), True, _sprites(m), None, pattern))
       
   return tilelist, monsterlist, decolist, portals, textlist
   
