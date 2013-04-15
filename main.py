@@ -6,6 +6,7 @@ from Actor import Actor
 from Inventory import Inventory
 from Utils import *
 from Spritesheet import Spritesheet
+from Portal import Portal
 import random
 import Text
   
@@ -26,6 +27,10 @@ class Play(object):
     self._TEXTSPEED=4
     
     self._sword = None
+    self._haabb = pygame.Rect(0, Tile.HALF, Tile.SIZE, Tile.HALF)
+    self._vaabb = pygame.Rect(2, Tile.HALF, Tile.SIZE-4, Tile.HALF)
+    self._spelunking = False
+    self._incave = False
     
     self._zoom = 2
     pygame.init()
@@ -38,14 +43,14 @@ class Play(object):
     ssprite = self._swordsprite
     lssprite = pygame.transform.rotate(ssprite,90)
     self._swordsprites = {x:y for x,y in zip(DIRECTIONS, (ssprite, pygame.transform.flip(ssprite,False,True), lssprite, pygame.transform.flip(lssprite,True,False)))}
-    self._lifetxt = Text.get('-LIFE-', (255,0,0))
+    self._lifetxt = Text.get('-LIFE-', (216,40,0))
     self._btxt = Text.get('Z')[0]
     self._atxt = Text.get('X')[0]
     
     iss = Spritesheet('icons.bmp')
     heart = iss.image_at((0,0,8,8), colorkey=(0,0,0))
-    self._fullheart = colorReplace(heart, (((128,128,128),(255,0,0)),))
-    self._halfheart = colorReplace(iss.image_at((8,0,8,8), colorkey=(0,0,0)), (((128,128,128),(255,0,0)),((255,255,255),(255,227,171))))
+    self._fullheart = colorReplace(heart, (((128,128,128), (216,40,0)),))
+    self._halfheart = colorReplace(iss.image_at((8,0,8,8), colorkey=(0,0,0)), (((128,128,128),(216,40,0)),((255,255,255),(255,227,171))))
     self._emptyheart = colorReplace(heart, (((128,128,128),(255,227,171)),))
     
     self._uibox = {}
@@ -71,16 +76,18 @@ class Play(object):
     atks[Direction.UP] = colorReplace(ss.image_at((16,32,16,16), colorkey=(0,0,0)), linkpalette)
     atks[Direction.DOWN] = colorReplace(ss.image_at((0,32,16,16), colorkey=(0,0,0)), linkpalette)
     atks[Direction.LEFT] = colorReplace(ss.image_at((32,32,16,16), colorkey=(0,0,0)), linkpalette)
-    self._pc = Actor(15*8,11*8,2,3*16,8,pygame.Rect(0, 0, Tile.SIZE, Tile.HALF),True,s,atksprites=atks)
-    self._inventory = Inventory()
-    self._pcweapons = []
+    self._pc = Actor(15*8,11*8,2,3*16,8,self._vaabb,True,s,atksprites=atks)
+    self._pc.addtriumphs((colorReplace(ss.image_at((48,0,16,16), colorkey=(0,0,0)), linkpalette),colorReplace(ss.image_at((48,16,16,16), colorkey=(0,0,0)), linkpalette)))
     
+    self._pcweapons = []
+    self._temps = []
+    self._startport = Portal('ow8-8.map', 15*8, 10*8)
     self._start()
     
   def _start(self):
-    self._pc.x = 15*8
-    self._pc.y = 11*8
-    self._loadmap('first.map')
+    self._pc.reset()
+    self._inventory = Inventory()
+    self._port(self._startport)
     
     
   @property
@@ -93,9 +100,16 @@ class Play(object):
   @property
   def _bounders(self):
     return [actor for actor in self._actors if actor.wallcollisions]
+  @property
+  def _updaters(self):
+    return self._actors+self._decos+self._collectibles.values()
     
   def _loadmap(self, m):
-    self._tiles, self._monsters, self._decos, self._portals, self._textlist = parse(m, self)
+    self._tiles, self._monsters, self._decos, self._portals, self._textlist, self._collectibles = parse(m, self)
+    g = globals()
+    l = locals()
+    self._collectibles = {id:coll for id,coll in self._collectibles.items() if eval(coll.condition,g,l)}
+    self._textlist = [text for text in self._textlist if eval(text.condition,g,l)]
     self._texttimer = 0
     self._texttimermax = len(self._textlist)*self._TEXTSPEED
     self._pc.stop()
@@ -113,16 +127,15 @@ class Play(object):
       w=3
       l=11
       if self._pc.direction == Direction.UP:
-        x,y,r = self._pc.x+3, self._pc.y-9-l, pygame.Rect(2, 0, w, l)
+        x,y,r = self._pc.x+3, self._pc.y-1-l, pygame.Rect(2, 0, w, l)
       elif self._pc.direction == Direction.RIGHT:
-        x,y,r = self._pc.x+12, self._pc.y-3, pygame.Rect(6, 3, l, w)
+        x,y,r = self._pc.x+12, self._pc.y+5, pygame.Rect(5, 3, l, w)
       elif self._pc.direction == Direction.DOWN:
-        x,y,r = self._pc.x+5, self._pc.y+4, pygame.Rect(2, 6, w, l)
+        x,y,r = self._pc.x+5, self._pc.y+12, pygame.Rect(2, 5, w, l)
       else:# self._pc.direction == Direction.LEFT:
-        x,y,r = self._pc.x-12, self._pc.y-3, pygame.Rect(0, 3, l, w)
+        x,y,r = self._pc.x-12, self._pc.y+5, pygame.Rect(0, 3, l, w)
       self._sword = Actor(x,y,0,0,atk,r,False,sprite)
       self._sword.direction = self._pc.direction
-      self._sword.setoffsets(0,0)
       self._pcweapons.append(self._sword)
     elif not self._pc.isAttacking and self._sword is not None:
       self._pcweapons.remove(self._sword)
@@ -133,28 +146,63 @@ class Play(object):
       self._pc.heal(self._pc.maxhp)
       self._start()
     self._monsters = [monster for monster in self._monsters if monster.hp > 0]
-  
+    
+  @property
+  def _porting(self):
+    return self._spelunking != 0
+    
+  def _timers(self):
+    for temp in self._temps:
+      temp[1] -= 1
+    self._temps = [[s,t] for [s,t] in self._temps if t > 0]
+    
+    if self._texttimer < self._texttimermax:
+      self._texttimer += 1
+    s = self._spelunking
+    if s != 0:
+      if self._cavetimer % 3 == 0:
+        self._pc.y -= s
+      if self._cavetimer > 0:
+        self._cavetimer -= 1
+        self._pc.incframe()
+      else:
+        self._spelunking = 0
+        if s == -1:
+          self._incave = True
+          self._port(self._currentport)
+    
   def _update(self):
     self._attacks()
     self._deaths()
-    [updater.update() for updater in self._actors+self._decos]
-    if self._texttimer < self._texttimermax:
-      self._texttimer += 1
+    self._timers()
+    [updater.update() for updater in self._updaters]
     self._input()
     self._physics()
     
   def _render(self):
     self._screen.fill((0,0,0))
     
-    for tile in self._tiles:
-      self._screen.blit(pygame.transform.scale(tile.img, (Tile.SIZE*self._zoom, Tile.SIZE*self._zoom)), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
-    for deco in self._decos:
-      self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))   
-    for tile in self._textlist[:self._texttimer/self._TEXTSPEED]: 
-      self._screen.blit(self._getzoom(tile.img), (tile.x*self._zoom, (tile.y+self._OFFSET)*self._zoom))
-    for actor in self._actors:
-      sprite = actor.sprite
-      self._screen.blit(pygame.transform.scale(sprite, (sprite.get_width()*self._zoom, sprite.get_height()*self._zoom)), ((actor.x+actor.xoffset)*self._zoom, (actor.y+self._OFFSET+actor.yoffset)*self._zoom))
+    if self._porting:
+      for tile in [tile for tile in self._tiles if tile.portal is not None]:
+        self._screen.blit(self._getzoom(tile.img), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
+      self._screen.blit(self._getzoom(self._pc.sprite), ((self._pc.x)*self._zoom, (self._pc.y+self._OFFSET)*self._zoom))
+      for tile in [tile for tile in self._tiles if tile.portal is None]:
+        self._screen.blit(self._getzoom(tile.img), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
+      for deco in self._decos:
+        self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))
+    else:
+      for tile in self._tiles:
+        self._screen.blit(self._getzoom(tile.img), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
+      for deco in self._decos:
+        self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))   
+      for coll in self._collectibles.values():
+        self._screen.blit(self._getzoom(coll.sprite), (coll.x*self._zoom, (coll.y+self._OFFSET)*self._zoom))   
+      for tile in self._textlist[:self._texttimer/self._TEXTSPEED]: 
+        self._screen.blit(self._getzoom(tile.img), (tile.x*self._zoom, (tile.y+self._OFFSET)*self._zoom))
+      for actor in self._actors:
+        self._screen.blit(self._getzoom(actor.sprite), ((actor.x)*self._zoom, (actor.y+self._OFFSET)*self._zoom))
+      for [s,t] in self._temps:
+        self._screen.blit(self._getzoom(s.img), ((s.x)*self._zoom, (s.y+self._OFFSET)*self._zoom))
       
     self._renderui()
     
@@ -163,7 +211,7 @@ class Play(object):
     pygame.display.flip()
 
   def _renderaabbdebug(self):
-    for aabb in [actor.aabb for actor in self._actors]:
+    for aabb in [actor.aabb for actor in self._actors+self._collectibles.values()]:
       r = self._getzoom(pygame.Surface((aabb.w, aabb.h)))
       r.fill((255,0,255))
       self._screen.blit(r, (aabb.x*self._zoom, (aabb.y+self._OFFSET)*self._zoom))
@@ -242,6 +290,7 @@ class Play(object):
           if self._pc.x % 8 == 0:
             dy += self._pc.speed
             self._pc.direction = Direction.DOWN
+            self._pc.setaabb(self._vaabb)
           elif self._pc.direction == Direction.LEFT:
             dx -= self._pc.speed
           elif self._pc.direction == Direction.RIGHT:
@@ -250,6 +299,7 @@ class Play(object):
           if self._pc.x % 8 == 0:
             dy -= self._pc.speed
             self._pc.direction = Direction.UP
+            self._pc.setaabb(self._vaabb)
           elif self._pc.direction == Direction.LEFT:
             dx -= self._pc.speed
           elif self._pc.direction == Direction.RIGHT:
@@ -259,6 +309,7 @@ class Play(object):
           if self._pc.y % 8 == 0:
             dx -= self._pc.speed
             self._pc.direction = Direction.LEFT
+            self._pc.setaabb(self._haabb)
           elif self._pc.direction == Direction.UP:
             dy -= self._pc.speed
           elif self._pc.direction == Direction.DOWN:
@@ -267,6 +318,7 @@ class Play(object):
           if self._pc.y % 8 == 0:
             dx += self._pc.speed
             self._pc.direction = Direction.RIGHT
+            self._pc.setaabb(self._haabb)
           elif self._pc.direction == Direction.UP:
             dy -= self._pc.speed
           elif self._pc.direction == Direction.DOWN:
@@ -305,81 +357,100 @@ class Play(object):
             monster.dy = dy
           
   def _physics(self):
-    for actor in self._bounders:
-      p = None
-      if actor.aabb.colliderect(self._UBOUND):
-        p = self._portals[Direction.UP]
-        actor.y = self._UBOUND.y+self._UBOUND.h
-      if actor.aabb.colliderect(self._RBOUND):
-        p = self._portals[Direction.RIGHT]
-        actor.x = self._RBOUND.x-actor.aabb.w
-      if actor.aabb.colliderect(self._BBOUND):
-        p = self._portals[Direction.DOWN]
-        actor.y = self._BBOUND.y-actor.aabb.h
-      if actor.aabb.colliderect(self._LBOUND):
-        p = self._portals[Direction.LEFT]
-        actor.x = self._LBOUND.x+self._LBOUND.w
-      if p is not None and actor is self._pc:
-        return self._port(p)
-        
-      actor.x += actor.dx
-      for tile in self._tiles:
-        for wall in tile.AABBs:
-          if actor.aabb.colliderect(wall):
-            if actor.dx < 0:
-              actor.x = wall.x+wall.w
-            else:
-              actor.x = wall.x-actor.aabb.w
-      actor.y += actor.dy
-      for tile in self._tiles:
-        for wall in tile.AABBs:
-          if actor.aabb.colliderect(wall):
-            if actor is self._pc and tile.isPortal:
-              return self._port(tile.portal)
-            else:
-              if actor.dy < 0:
-                actor.y = wall.y+wall.h
-              else:
-                actor.y = wall.y-actor.aabb.h
-            
-    for monster in self._monsters:
-      for weapon in self._pcweapons:
-        if monster.aabb.colliderect(weapon.aabb) and not monster.isInvincible:
-          monster.hurt(weapon.attack)
-          monster.becomeInvincible(30)
-          monster.loseControl(8)
-          monster.stop()
-          speed = self._pc.speed*2
-          if self._pc.direction == Direction.UP:
-            monster.dy = -speed
-          if self._pc.direction == Direction.DOWN:
-            monster.dy = speed
-          if self._pc.direction == Direction.LEFT:
-            monster.dx = -speed
-          if self._pc.direction == Direction.RIGHT:
-            monster.dx = speed
+    if not self._porting:
+      for actor in self._bounders:
+        p = None
+        if actor.aabb.colliderect(self._UBOUND):
+          p = self._portals[Direction.UP]
+          actor.y = self._UBOUND.y+self._UBOUND.h-actor.yoffset
+        if actor.aabb.colliderect(self._RBOUND):
+          p = self._portals[Direction.RIGHT]
+          actor.x = self._RBOUND.x-actor.aabb.w-actor.xoffset
+        if actor.aabb.colliderect(self._BBOUND):
+          p = self._portals[Direction.DOWN]
+          actor.y = self._BBOUND.y-actor.aabb.h-actor.yoffset
+        if actor.aabb.colliderect(self._LBOUND):
+          p = self._portals[Direction.LEFT]
+          actor.x = self._LBOUND.x+self._LBOUND.w-actor.xoffset
+        if p is not None and actor is self._pc:
+          self._port(p)
+          if self._incave:
+            self._spelunking = 1
+            self._incave = False
+            self._cavetimer = 47
+            self._pc.loseControl(47)
           
-      if self._pc.aabb.colliderect(monster.aabb) and not self._pc.isInvincible:
-        self._pc.hurt(monster.attack)
-        self._pc.becomeInvincible(30)
-        self._pc.loseControl(8)
-        self._pc.stop()
-        if not self._pc.isAttacking:
-          speed = self._pc.speed*2
-          if monster.direction == Direction.UP:
-            self._pc.dy = -speed
-          if monster.direction == Direction.DOWN:
-            self._pc.dy = speed
-          if monster.direction == Direction.LEFT:
-            self._pc.dx = -speed
-          if monster.direction == Direction.RIGHT:
-            self._pc.dx = speed
+        actor.x += actor.dx
+        for tile in self._tiles:
+          for wall in tile.AABBs:
+            if actor.aabb.colliderect(wall):
+              if actor.dx < 0:
+                actor.x = wall.x+wall.w-actor.xoffset
+              else:
+                actor.x = wall.x-actor.aabb.w-actor.xoffset
+        actor.y += actor.dy
+        for tile in self._tiles:
+          for wall in tile.AABBs:
+            if actor.aabb.colliderect(wall):
+              if actor.dy < 0:
+                actor.y = wall.y+wall.h-actor.yoffset
+              else:
+                actor.y = wall.y-actor.aabb.h-actor.yoffset
+              if actor is self._pc and tile.isPortal:
+                self._spelunking = -1
+                self._currentport = tile.portal
+                self._cavetimer = 47
+                self._pc.loseControl(47)
+              
+      for monster in self._monsters:
+        for weapon in self._pcweapons:
+          if monster.aabb.colliderect(weapon.aabb) and not monster.isInvincible:
+            monster.hurt(weapon.attack)
+            monster.becomeInvincible(30)
+            monster.loseControl(8)
+            monster.stop()
+            speed = self._pc.speed*2
+            if self._pc.direction == Direction.UP:
+              monster.dy = -speed
+            if self._pc.direction == Direction.DOWN:
+              monster.dy = speed
+            if self._pc.direction == Direction.LEFT:
+              monster.dx = -speed
+            if self._pc.direction == Direction.RIGHT:
+              monster.dx = speed
+            
+        if self._pc.aabb.colliderect(monster.aabb) and not self._pc.isInvincible:
+          self._pc.hurt(monster.attack)
+          self._pc.becomeInvincible(30)
+          self._pc.loseControl(8)
+          self._pc.stop()
+          if not self._pc.isAttacking:
+            speed = self._pc.speed*2
+            if monster.direction == Direction.UP:
+              self._pc.dy = -speed
+            if monster.direction == Direction.DOWN:
+              self._pc.dy = speed
+            if monster.direction == Direction.LEFT:
+              self._pc.dx = -speed
+            if monster.direction == Direction.RIGHT:
+              self._pc.dx = speed
+
+      for collectible in self._collectibles.values():
+        if collectible.aabb.colliderect(self._pc.aabb):
+          exec collectible.action
+          if collectible.triumph:
+            self._pc.x = collectible.x-(collectible.x%8)
+            self._pc.y = collectible.y+(-collectible.y%8)
+            self._pc.triumph(48)
+            self._temps.append([Tile.Tile(self._pc.x,self._pc.y-16,collectible.sprite,size=1),48])
       
   def _port(self, portal):
-    self._inventory.changesword(1)
+    self._currentport = None
     self._loadmap(portal.destfile)
-    self._pc.x = portal.destx
-    self._pc.y = portal.desty  
+    if portal.destx != -1:
+      self._pc.x = portal.destx
+    if portal.desty != -1:
+      self._pc.y = portal.desty  
     
 class Game(object):
   def __init__(self):

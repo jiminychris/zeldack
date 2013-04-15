@@ -1,0 +1,21 @@
+<collectibles>
+  <sword triumph="True">
+    <action>
+self._inventory.changesword(1)
+self._collectibles.pop('sword')
+    </action>
+    <rect x="2" y="11" w="3" h="5" />
+    <sprites sheet="weapons.bmp">
+      <palette>
+        <color r="0" g="0" b="0" />
+        <color r="200" g="76" b="12" />
+        <color r="128" g="208" b="16" />
+        <color r="252" g="152" b="56" />
+      </palette>
+      <colorkey>
+        <color r="0" g="0" b="0" />
+      </colorkey>
+      <sprite x="0" y="0" w="8" h="16" />
+    </sprites>
+  </sword>
+</collectibles>

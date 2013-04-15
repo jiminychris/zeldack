@@ -6,25 +6,15 @@ class Actor(object):
   def __init__(self, x, y, speed, hp, attack, aabb, wallcollisions=True, sprites=None, atksprites=None, ai=None):
     self._x = x
     self._y = y
-    self._dx = 0
-    self._dy = 0
-    self._hp = hp
     self._maxhp = hp
     self._attack = attack
-    self._atktimer = 0
     self._aabb = aabb
-    self._canAttack = True
     self._speed = speed
     self._wallcollisions = wallcollisions
-    self._XOFFSET = self._xoffset = 0
-    self._YOFFSET = self._yoffset = -Tile.HALF
-    self._frame = 0
-    self._anim = 0
-    self._lctimer = 0
-    self._invtimer = 0
     self._ai = ai
     self._sprites = sprites
     self._atksprites = atksprites
+    self.reset()
     if sprites is not None: 
       if Direction.UP not in sprites.keys():
         raise ValueError('Expected at least UP sprite in dict')
@@ -46,6 +36,19 @@ class Actor(object):
     
     self.direction = Direction.DOWN
     
+  def reset(self):
+    self._dx = 0
+    self._dy = 0
+    self._hp = self._maxhp
+    self._atktimer = 0
+    self._canAttack = True
+    self._frame = 0
+    self._anim = 0
+    self._lctimer = 0
+    self._invtimer = 0
+    self._triumphtimer = 0
+    self._triumphtimer = 0
+    
   def update(self):
     if self._atktimer > 0:
       self._atktimer -= 1
@@ -53,10 +56,15 @@ class Actor(object):
       self._invtimer -= 1
     if self._lctimer > 0: 
       self._lctimer -= 1
+    if self._triumphtimer > 0: 
+      self._triumphtimer -= 1
     
-  def setoffsets(self, ox, oy):
-    self._xoffset = ox
-    self._yoffset = oy
+  @property
+  def xoffset(self):
+    return self._aabb.x
+  @property
+  def yoffset(self):
+    return self._aabb.y
   
   @property
   def wallcollisions(self):
@@ -135,15 +143,6 @@ class Actor(object):
     self._y = value
     
   @property
-  def xoffset(self):
-    return self._xoffset
-    
-    
-  @property
-  def yoffset(self):
-    return self._yoffset
-    
-  @property
   def speed(self):
     return self._speed
     
@@ -168,19 +167,32 @@ class Actor(object):
   @property
   def aabb(self):
     return pygame.Rect(self._aabb.x+self._x, self._aabb.y+self._y, self._aabb.w, self._aabb.h)
+  
+  def setaabb(self, aabb):
+    self._aabb = aabb
     
   @property
   def sprite(self):
-    if self.isAttacking and self._atksprites is not None:
+    if self._triumphtimer and self._triumphsprites is not None:
+      sprite = self._triumphsprites[0]
+    elif self.isAttacking and self._atksprites is not None:
       sprite = self._atksprites[self.direction]
     else:
       sprite = self._sprites[self.direction][self._anim]
     return sprite
     
+  def triumph(self, t):
+    self.stop()
+    self.loseControl(t)
+    self._triumphtimer = t
+    
+  def addtriumphs(self, triumphsprites):
+    self._triumphsprites = triumphsprites
+    
   def incframe(self, value=1):
     self._frame += value
-    while self._frame > 8: 
-      self._frame -= 8
+    while self._frame > 4: 
+      self._frame = 0
       self._anim = (self._anim + 1) % 2
       
     

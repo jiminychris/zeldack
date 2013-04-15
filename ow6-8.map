@@ -1,5 +1,8 @@
 <map>
   <portals>
+    <right>
+      <portal file="ow7-8.map" x="0" y="-1" />
+    </right>
   </portals>
   <tiles file="tiles.bmp">
     <palette>
@@ -14,14 +17,21 @@
     <def type="door">
       <sprite x="48" y="0" w="16" h="16" />
       <rect x="0" y="0" w="2" h="1" />
-      <portal file="swordcave.map" x="112" y="160" />
+    </def>
+    <def type="water">
+      <sprite x="16" y="0" w="16" h="16" />
+      <rect x="0" y="0" w="2" h="2" />
     </def>
     <def type="wall">
-      <sprite x="64" y="0" w="16" h="16" />
+      <sprite x="0" y="32" w="16" h="16" />
       <rect x="0" y="0" w="2" h="2" />
     </def>
     <def type="wall-top">
-      <sprite x="64" y="16" w="16" h="16" />
+      <sprite x="16" y="32" w="16" h="16" />
+      <rect x="0" y="0" w="2" h="2" />
+    </def>
+    <def type="rock">
+      <sprite x="32" y="32" w="16" h="16" />
       <rect x="0" y="0" w="2" h="2" />
     </def>
     <def type="top-left-corner">
@@ -49,11 +59,11 @@
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
       <tile type="floor" />
-      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="wall" />
+      <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
@@ -63,85 +73,31 @@
       <tile type="wall" />
     </row>
     <row>
-      <tile type="wall" />
-      <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
       <tile type="door" />
+      <tile type="top-left-corner" />
+      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="top-right-corner" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+    </row>
+    <row>
       <tile type="wall" />
       <tile type="top-left-corner" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="top-left-corner" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall"/>
-      <tile type="wall"/>
-      <tile type="top-left-corner" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall"/>
-      <tile type="wall"/>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall"/>
-      <tile type="top-left-corner"/>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="top-right-corner"/>
-      <tile type="wall"/>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
@@ -153,89 +109,143 @@
       <tile type="floor" />
     </row>
     <row>
+      <tile type="wall"/>
+      <tile type="floor"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="floor" />
+      <tile type="rock" />
+      <tile type="floor"/>
+      <tile type="floor"/>
+      <tile type="floor" />
+      <tile type="rock" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+    </row>
+    <row>
+      <tile type="wall"/>
+      <tile type="floor"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor"/>
+      <tile type="rock"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+    </row>
+    <row>
+      <tile type="wall" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="rock" />
+      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="floor" />
+      <tile type="rock" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="rock" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+    </row>
+    <row>
+      <tile type="wall" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor"/>
+      <tile type="rock"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+    </row>
+    <row>
+      <tile type="wall"/>
+      <tile type="floor"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="floor" />
+      <tile type="rock" />
+      <tile type="floor"/>
+      <tile type="floor"/>
+      <tile type="floor" />
+      <tile type="rock" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+    </row>
+    <row>
+      <tile type="wall"/>
+      <tile type="bottom-left-corner"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+    </row>
+    <row>
+      <tile type="wall"/>
+      <tile type="wall"/>
+      <tile type="wall-top" />
       <tile type="wall-top" />
       <tile type="bottom-left-corner" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor"/>
-      <tile type="floor"/>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall-top" />
-      <tile type="wall-top" />
-    </row>
-    <row>
-      <tile type="wall"/>
-      <tile type="wall"/>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor"/>
-      <tile type="floor"/>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall"/>
-      <tile type="wall"/>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor"/>
-      <tile type="floor"/>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall"/>
-      <tile type="wall"/>
-      <tile type="wall-top" />
-      <tile type="wall-top" />
-      <tile type="wall-top" />
-      <tile type="wall-top" />
-      <tile type="wall-top" />
-      <tile type="wall-top" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="bottom-right-corner" />
       <tile type="wall-top" />
       <tile type="wall-top"/>
       <tile type="wall-top"/>
       <tile type="wall-top" />
       <tile type="wall-top" />
       <tile type="wall-top" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="wall-top" />
+      <tile type="wall-top" />
     </row>
     <row>
-      <tile type="wall"/>
-      <tile type="wall"/>
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
+      <tile type="water" />
+      <tile type="water" />
       <tile type="wall" />
       <tile type="wall" />
-      <tile type="wall"/>
-      <tile type="wall"/>
+      <tile type="wall" />
+      <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
@@ -244,7 +254,10 @@
     </row>
   </tiles>
   <monsters file="monsters.mon">
-    <monster id="octorok" x="128" y="128" />
-    <monster id="boctorok" x="144" y="136" />
+    <monster id="octorok" x="48" y="48" />
+    <monster id="octorok" x="32" y="80" />
+    <monster id="octorok" x="112" y="96" />
+    <monster id="octorok" x="160" y="48" />
+    <monster id="octorok" x="160" y="128" />
   </monsters>
 </map>

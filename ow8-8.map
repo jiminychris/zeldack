@@ -1,41 +1,58 @@
 <map>
-  <text>
-    <condition>self._inventory.sword == 0</condition>
-    <line x="48" y="40" value="IT'S DANGEROUS TO GO" />
-    <line x="64" y="48" value="ALONE! TAKE THIS." />
-  </text>
-  <collectibles file="collectibles.col">
-    <collectible id="sword" x="124" y="84">
-      <condition>self._inventory.sword == 0</condition>
-    </collectible>
-  </collectibles>
   <portals>
-    <down>
-      <portal file="ow8-8.map" x="64" y="32" />
-    </down>
+    <up>
+      <portal file="ow8-7.map" x="-1" y="160" />
+    </up>
+    <right>
+      <portal file="ow9-8.map" x="0" y="-1" />
+    </right>
+    <left>
+      <portal file="ow7-8.map" x="240" y="-1" />
+    </left>
   </portals>
   <tiles file="tiles.bmp">
     <palette>
       <color r="0" g="0" b="0" />
-      <color r="171" g="0" b="0" />
-      <color r="200" g="200" b="200" />
-      <color r="0" g="0" b="0" />
+      <color r="0" g="171" b="0" />
+      <color r="192" g="192" b="192" />
+      <color r="255" g="227" b="171" />
     </palette>
     <def type="floor">
       <sprite x="0" y="0" w="16" h="16" />
     </def>
+    <def type="door">
+      <sprite x="48" y="0" w="16" h="16" />
+      <rect x="0" y="0" w="2" h="1" />
+      <portal file="swordcave.map" x="112" y="152" />
+    </def>
     <def type="wall">
       <sprite x="0" y="32" w="16" h="16" />
-      <rect x="0" y="0" w="2" h="2" />
-    </def>
-    <def type="invisiwall">
-      <sprite x="0" y="0" w="16" h="16" />
       <rect x="0" y="0" w="2" h="2" />
     </def>
     <def type="wall-top">
       <sprite x="16" y="32" w="16" h="16" />
       <rect x="0" y="0" w="2" h="2" />
     </def>
+    <def type="top-left-corner">
+      <sprite x="0" y="16" w="16" h="16" />
+      <rect x="0" y="0" w="2" h="1" />
+      <rect x="0" y="1" w="1" h="1" />
+    </def>
+    <def type="top-right-corner">
+      <sprite x="16" y="16" w="16" h="16" />
+      <rect x="0" y="0" w="2" h="1" />
+      <rect x="1" y="1" w="1" h="1" />
+    </def>
+    <def type="bottom-right-corner">
+      <sprite x="32" y="16" w="16" h="16" />
+      <rect x="1" y="0" w="1" h="1" />
+      <rect x="0" y="1" w="2" h="1" />
+    </def>
+    <def type="bottom-left-corner">
+      <sprite x="48" y="16" w="16" h="16" />
+      <rect x="0" y="0" w="1" h="1" />
+      <rect x="0" y="1" w="2" h="1" />
+    </def>
     <row>
       <tile type="wall" />
       <tile type="wall" />
@@ -44,8 +61,8 @@
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="floor" />
+      <tile type="floor" />
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
@@ -59,11 +76,11 @@
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
+      <tile type="door" />
       <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="top-left-corner" />
+      <tile type="floor" />
+      <tile type="floor" />
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
@@ -75,6 +92,58 @@
     <row>
       <tile type="wall" />
       <tile type="wall" />
+      <tile type="wall" />
+      <tile type="top-left-corner" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+    </row>
+    <row>
+      <tile type="wall"/>
+      <tile type="wall"/>
+      <tile type="top-left-corner" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="wall"/>
+      <tile type="wall"/>
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+    </row>
+    <row>
+      <tile type="wall"/>
+      <tile type="top-left-corner"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="top-right-corner"/>
+      <tile type="wall"/>
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+      <tile type="wall" />
+    </row>
+    <row>
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
@@ -84,6 +153,44 @@
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+    </row>
+    <row>
+      <tile type="wall-top" />
+      <tile type="bottom-left-corner" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor"/>
+      <tile type="floor"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="wall-top" />
+      <tile type="wall-top" />
+    </row>
+    <row>
+      <tile type="wall"/>
+      <tile type="wall"/>
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor"/>
+      <tile type="floor"/>
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
@@ -91,8 +198,8 @@
       <tile type="wall" />
     </row>
     <row>
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="wall"/>
+      <tile type="wall"/>
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
@@ -100,44 +207,8 @@
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="invisiwall" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
+      <tile type="floor"/>
+      <tile type="floor"/>
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
@@ -145,71 +216,17 @@
       <tile type="wall" />
     </row>
     <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
-    </row>
-    <row>
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="wall"/>
+      <tile type="wall"/>
       <tile type="wall-top" />
       <tile type="wall-top" />
       <tile type="wall-top" />
       <tile type="wall-top" />
       <tile type="wall-top" />
-      <tile type="floor" />
-      <tile type="floor" />
       <tile type="wall-top" />
       <tile type="wall-top" />
+      <tile type="wall-top"/>
+      <tile type="wall-top"/>
       <tile type="wall-top" />
       <tile type="wall-top" />
       <tile type="wall-top" />
@@ -217,6 +234,8 @@
       <tile type="wall" />
     </row>
     <row>
+      <tile type="wall"/>
+      <tile type="wall"/>
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
@@ -224,10 +243,8 @@
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="wall"/>
+      <tile type="wall"/>
       <tile type="wall" />
       <tile type="wall" />
       <tile type="wall" />
@@ -235,20 +252,4 @@
       <tile type="wall" />
     </row>
   </tiles>
-  <decorations file="decos.bmp">
-    <def type="fire" animtype="fliph">
-      <sprite x="0" y="0" w="16" h="16" />
-      <colorkey>
-        <color r="0" g="0" b="0" />
-      </colorkey>
-      <palette>
-        <color r="0" g="0" b="0" />
-        <color r="255" g="0" b="0" />
-        <color r="255" g="155" b="59" />
-        <color r="255" g="255" b="255" />
-      </palette>
-    </def>
-    <decoration type="fire" x="72" y="64" />
-    <decoration type="fire" x="168" y="64" />
-  </decorations>
 </map>

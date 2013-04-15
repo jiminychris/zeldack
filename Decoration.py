@@ -13,7 +13,7 @@ class Decoration(object):
     
   def update(self):
     self._frame += 1
-    if self._frame == 8:
+    if self._frame == 4:
       self._frame = 0
       self._anim = (self._anim + 1) % len(self._sprites)
     

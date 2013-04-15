@@ -10,11 +10,18 @@ class Tile(object):
     self._x = x * size
     self._y = y * size
     self._img = img
+    self._condition = 'True'
     self._portal = portal
     if AABBs is None:
       AABBs = ()
     self._AABBs = map(lambda x: pygame.Rect(x.x*HALF+self._x, x.y*HALF+self._y, x.w*HALF, x.h*HALF), AABBs)
+
+  def addcond(self, cond):
+    self._condition = cond
     
+  @property
+  def condition(self):
+    return self._condition
   @property
   def x(self):
     return self._x

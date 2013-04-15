@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as et
 import Tile
 from Portal import Portal
+from Collectible import Collectible
 import Text
 from pygame.rect import Rect
 from Actor import Actor
@@ -21,12 +22,18 @@ def parse(fname, main):
   decolist = []
   portals = {}
   textlist = []
-  
+  collist = {}
   
   root = tree.getroot()
   textnode = root.find('text')
   if textnode is not None:
+    cond = textnode.find('condition')
+    if cond is None:
+      cond = 'True'
+    else:
+      cond = cond.text
     textlist = [tile for line in textnode.findall('line') for tile in _parseline(line)]
+    [tile.addcond(cond) for tile in textlist]
   tiledefs = {}
   aabbdefs = {}
   portdefs = {}
@@ -48,7 +55,6 @@ def parse(fname, main):
   [tiledefs.update(((d.get('type', 'blank'), colorReplace(tss.image_at(_parsesprite(d.find('sprite'))), repl)),)) for d in tn.findall('def')]
   [aabbdefs.update(((d.get('type', 'blank'), _parserects(d)),)) for d in tn.findall('def')]
   [portdefs.update(((d.get('type', 'blank'), _parseport(d)),)) for d in tn.findall('def')]
-  monsterfiles = root.find('monsterfiles')
   rows = tn.findall('row')
   monsters = root.find('monsters')
   if monsters is not None:
@@ -57,12 +63,46 @@ def parse(fname, main):
     monsters = monsters.findall('monster')
   else:
     monsters = []
+  collectibles = root.find('collectibles')
+  if collectibles is not None:
+    colfile = collectibles.get('file', 'collectibles.col')
+    colroot = _safeopen(colfile).getroot()
+    collectibles = collectibles.findall('collectible')
+  else:
+    collectibles = []
   
   for j in range(len(rows)):
     tiles = rows[j].findall('tile')
     for i in range(len(tiles)):
       t = tiles[i].get('type', 'blank')
       tilelist.append(Tile.Tile(i, j, tiledefs[t], aabbdefs[t], portdefs[t]))
+
+  for collectible in collectibles:
+    id = collectible.get('id', 'sword')
+    c = None
+    c = colroot.find(id)
+    if c is None:
+      raise ValueError('could not find collectible with id \''+id+'\' in '+str(monroots))
+    triumph = bool(c.get('triumph', 'False'))
+    action = c.find('action')
+    cond = collectible.find('condition')
+    aabb = _parserect(c.find('rect'))
+    spriten = c.find('sprites')
+    ck = _parsecolor(spriten.find('colorkey').find('color'))
+    repl = zip(_DEFAULTCOLORS,_parsecolors(spriten.find('palette')))
+    sfile = spriten.get('file','weapons.bmp')
+    css = Spritesheet(sfile)
+    sprites = [colorReplace(css.image_at(_parsesprite(sp),ck),repl) for sp in spriten.findall('sprite')]
+    if action is None:
+      action = ''
+    else:
+      action = action.text
+    if cond is None:
+      cond = True
+    else:
+      cond = cond.text
+    x,y = int(collectible.get('x','0')),int(collectible.get('y','0'))
+    collist[id] = Collectible(x,y,aabb,sprites,cond,action,triumph)
       
   for monster in monsters:
     id = monster.get('id', 'octorok')
@@ -98,9 +138,9 @@ def parse(fname, main):
         speed = int(options[random.randint(0,len(options)-1)].text)
     if pattern is not None:
       pattern = pattern.text
-    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, hp, atk, pygame.Rect(0, 0, Tile.SIZE, Tile.HALF), True, _sprites(m), None, pattern))
+    monsterlist.append(Actor(int(monster.get('x', '0')), int(monster.get('y', '0')), speed, hp, atk, pygame.Rect(0, 0, Tile.SIZE, Tile.SIZE), True, _sprites(m), None, pattern))
       
-  return tilelist, monsterlist, decolist, portals, textlist
+  return tilelist, monsterlist, decolist, portals, textlist, collist
   
 def _sprites(node):
   s = node.find('sprites')
