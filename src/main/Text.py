@@ -1,6 +1,6 @@
 import pygame
 from Spritesheet import Spritesheet
-from Utils import colorReplace
+from Utils import *
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -16,7 +16,7 @@ def initialize():
           'NOPQRSTUVWXYZ',
           '0123456789',
           '-.,!\'& ')
-  ss = Spritesheet('text.bmp')
+  ss = Spritesheet(bmpres('text.bmp'))
   global TEXT
   TEXT = {}
   for j in range(len(rows)):

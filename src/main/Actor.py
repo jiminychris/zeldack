@@ -3,12 +3,13 @@ import pygame
 from Utils import *
 
 class Actor(object):
-  def __init__(self, x, y, speed, hp, attack, aabb, wallcollisions=True, sprites=None, atksprites=None, ai=None):
+  def __init__(self, x, y, speed, hp, attack, collaabb, wallcollisions=True, sprites=None, atksprites=None, ai=None):
     self._x = x
     self._y = y
     self._maxhp = hp
     self._attack = attack
-    self._aabb = aabb
+    self._collaabb = collaabb
+    self._hitaabb = collaabb
     self._speed = speed
     self._wallcollisions = wallcollisions
     self._ai = ai
@@ -60,11 +61,18 @@ class Actor(object):
       self._triumphtimer -= 1
     
   @property
-  def xoffset(self):
-    return self._aabb.x
+  def collxoffset(self):
+    return self._collaabb.x
   @property
-  def yoffset(self):
-    return self._aabb.y
+  def collyoffset(self):
+    return self._collaabb.y
+    
+  @property
+  def hitxoffset(self):
+    return self._hitaabb.x
+  @property
+  def hityoffset(self):
+    return self._hitaabb.y
   
   @property
   def wallcollisions(self):
@@ -165,11 +173,20 @@ class Actor(object):
     return self._ai
     
   @property
-  def aabb(self):
-    return pygame.Rect(self._aabb.x+self._x, self._aabb.y+self._y, self._aabb.w, self._aabb.h)
+  def collaabb(self):
+    return pygame.Rect(self._collaabb.x+self._x, self._collaabb.y+self._y, self._collaabb.w, self._collaabb.h)
+        
+  @property
+  def hitaabb(self):
+    return pygame.Rect(self._hitaabb.x+self._x, self._hitaabb.y+self._y, self._hitaabb.w, self._hitaabb.h)
   
   def setaabb(self, aabb):
-    self._aabb = aabb
+    self.setcollaabb(aabb)
+    self.sethitaabb(aabb)
+  def setcollaabb(self, aabb):
+    self._collaabb = aabb  
+  def sethitaabb(self, aabb):
+    self._hitaabb = aabb
     
   @property
   def sprite(self):
