@@ -5,6 +5,7 @@ from Collectible import Collectible
 import Text
 from pygame.rect import Rect
 from Actor import Actor
+from Map import Map
 from Spritesheet import Spritesheet
 from Decoration import Decoration
 import random
@@ -40,6 +41,14 @@ class Parser(object):
     else:
       pn = tn.find('palette')
       self._palettedefs = {'default': _parsecolors(pn)}
+
+  def parse(self):
+    return Map(self.parseTiles(),
+               self.parseMonsters(),
+               self.parseDecorations(),
+               self.parsePortals(),
+               self.parseText(),
+               self.parseCollectibles())
 
   def parseTiles(self):
     tilelist = []
