@@ -23,10 +23,10 @@
     <rect x="0" y="0" w="2" h="2" />
   </def>
   <def type="top-right-shore">
-    <sprite x="32" y="64" w="16" h="16" />
+    <sprite x="48" y="64" w="16" h="16" />
   </def>
   <def type="top-left-shore">
-    <sprite x="48" y="64" w="16" h="16" />
+    <sprite x="32" y="64" w="16" h="16" />
   </def>
   <def type="bridge">
     <sprite x="48" y="48" w="16" h="16" />
@@ -49,6 +49,26 @@
   </def>
   <def type="tree">
     <sprite x="48" y="32" w="16" h="16" />
+    <rect x="0" y="0" w="2" h="2" />
+  </def>
+  <def type="top-left-tree">
+    <sprite x="64" y="0" w="16" h="16" />
+    <rect x="0" y="0" w="2" h="2" />
+  </def>
+  <def type="top-right-tree">
+    <sprite x="64" y="16" w="16" h="16" />
+    <rect x="0" y="0" w="2" h="2" />
+  </def>
+  <def type="bottom-left-tree">
+    <sprite x="64" y="32" w="16" h="16" />
+    <rect x="0" y="0" w="2" h="2" />
+  </def>
+  <def type="bottom-right-tree">
+    <sprite x="64" y="48" w="16" h="16" />
+    <rect x="0" y="0" w="2" h="2" />
+  </def>
+  <def type="tree-face">
+    <sprite x="64" y="64" w="16" h="16" />
     <rect x="0" y="0" w="2" h="2" />
   </def>
   <def type="top-left-corner">

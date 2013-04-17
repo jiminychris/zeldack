@@ -1,10 +1,10 @@
 <map>
   <portals>
     <right>
-      <portal file="ow7-6.map" x="0" y="-1" />
+      <portal file="ow8-5.map" />
     </right>
     <down>
-      <portal file="ow6-7.map" x="-1" y="0" />
+      <portal file="ow7-6.map" />
     </down>
   </portals>
   <tiles file="tiles.til">
@@ -87,15 +87,15 @@
       <tile type="water" />
     </row>
     <row>
-      <tile type="shore-horiz" />
-      <tile type="shore-horiz" />
-      <tile type="shore-horiz" />
-      <tile type="shore-horiz" />
       <tile type="water" />
       <tile type="water" />
       <tile type="water" />
       <tile type="water" />
-      <tile type="bridge" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="shore-horiz" />
       <tile type="shore-horiz" />
       <tile type="shore-horiz" />
       <tile type="shore-horiz" />
@@ -105,11 +105,11 @@
       <tile type="shore-horiz" />
     </row>
     <row>
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="top-right-shore" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
       <tile type="water" />
       <tile type="water" />
       <tile type="top-left-shore" />
@@ -123,13 +123,13 @@
       <tile type="floor" />
     </row>
     <row>
-      <tile type="wall-top" />
-      <tile type="wall-top" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
       <tile type="water" />
       <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="shore-vert" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
@@ -137,83 +137,80 @@
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="wall-top" />
-      <tile type="wall-top" />
+      <tile type="floor" />
+      <tile type="floor" />
     </row>
     <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
       <tile type="water" />
       <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="shore-vert" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
     </row>
     <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
       <tile type="water" />
       <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="shore-vert" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
     </row>
     <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
       <tile type="water" />
       <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="shore-vert" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall-top" />
-      <tile type="floor" />
-      <tile type="wall-top" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
     </row>
     <row>
-      <tile type="wall" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
       <tile type="water" />
       <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="water" />
+      <tile type="shore-vert" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="floor" />
-      <tile type="wall" />
-      <tile type="wall" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
+      <tile type="tree" />
     </row>
   </tiles>
-  <monsters file="monsters.mon">
-    <monster id="octorok" x="128" y="80" />
-  </monsters>
 </map>
