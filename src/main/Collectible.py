@@ -22,9 +22,15 @@ class Collectible(object):
   @property
   def x(self):
     return self._x
+  @x.setter
+  def x(self, value):
+    self._x = value
   @property
   def y(self):
     return self._y
+  @y.setter
+  def y(self, value):
+    self._y = value
   @property
   def aabb(self):
     return pygame.Rect(self._aabb.x+self._x, self._aabb.y+self._y,self._aabb.w,self._aabb.h)

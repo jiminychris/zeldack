@@ -1,7 +1,7 @@
 import sys
 import pygame
 
-from Parser import Parser
+from Parser import *
 import Tile
 import time
 from Actor import Actor
@@ -97,6 +97,13 @@ class Play(object):
     self._startport = Portal(self._startmap, 15*8, 10*8)
     self._start()
     
+  def _getHeartCollectible(self):
+    return parseCollectible(defres('collectibles.col'), 'heart')
+  def _getRupeeCollectible(self):
+    return parseCollectible(defres('collectibles.col'), 'rupee')
+  def _getBlueRupeeCollectible(self):
+    return parseCollectible(defres('collectibles.col'), 'brupee')
+    
   def _start(self):
     self._pc.reset()
     self._currentmapname = self._startmap
@@ -120,7 +127,7 @@ class Play(object):
     return [actor for actor in self._actors if actor.wallcollisions]
   @property
   def _updaters(self):
-    return self._actors+self._decos+self._collectibles.values()
+    return self._actors+self._decos+self._collectibles
   @property
   def _currentmap(self):
     return self._maps[self._currentmapname]
@@ -165,7 +172,7 @@ class Play(object):
     self._maps = {k: v for k, v in self._maps.items() if k in self._maphistory}
     g = globals()
     l = locals()
-    self._collectibles = {id:coll for id,coll in self._collectibles.items() if eval(coll.condition,g,l)}
+    self._collectibles = [coll for coll in self._collectibles if eval(coll.condition,g,l)]
     self._textlist = [text for text in self._textlist if eval(text.condition,g,l)]
     self._texttimer = 0
     self._zonetimer = 0
@@ -203,7 +210,25 @@ class Play(object):
     if self._pc.hp == 0:
       self._pc.heal(self._pc.maxhp)
       self._start()
+    deads = [monster for monster in self._monsters if monster.hp == 0]
     self._monsters = [monster for monster in self._monsters if monster.hp > 0]
+    for monster in deads:
+      roll = random.randint(1,20)
+      if roll > 10 and roll < 15:
+        c = self._getHeartCollectible()
+      elif roll > 14 and roll < 19:
+        c = self._getRupeeCollectible()
+      elif roll == 19:
+        c = self._getBlueRupeeCollectible()
+      elif roll == 20:
+        c = None
+        #print 'fairy'
+      else:
+        c = None
+      if c is not None:
+        c.x = monster.x
+        c.y = monster.y
+        self._collectibles.append(c)
     
   @property
   def _porting(self):
@@ -284,7 +309,7 @@ class Play(object):
         self._screen.blit(self._getzoom(tile.img), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
       for deco in self._decos:
         self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))   
-      for coll in self._collectibles.values():
+      for coll in self._collectibles:
         self._screen.blit(self._getzoom(coll.sprite), (coll.x*self._zoom, (coll.y+self._OFFSET)*self._zoom))   
       for tile in self._textlist[:self._texttimer/self._TEXTSPEED]: 
         self._screen.blit(self._getzoom(tile.img), (tile.x*self._zoom, (tile.y+self._OFFSET)*self._zoom))    
@@ -308,7 +333,7 @@ class Play(object):
       r = self._getzoom(pygame.Surface((aabb.w, aabb.h)))
       r.fill((255,0,255))
       self._screen.blit(r, (aabb.x*self._zoom, (aabb.y+self._OFFSET)*self._zoom))
-    for aabb in [coll.aabb for coll in self._collectibles.values()]:
+    for aabb in [coll.aabb for coll in self._collectibles]:
       r = self._getzoom(pygame.Surface((aabb.w, aabb.h)))
       r.fill((255,0,255))
       self._screen.blit(r, (aabb.x*self._zoom, (aabb.y+self._OFFSET)*self._zoom))
@@ -536,9 +561,10 @@ class Play(object):
               if monster.direction == Direction.RIGHT:
                 self._pc.dx = speed
 
-        for collectible in self._collectibles.values():
+        for collectible in self._collectibles:
           if collectible.aabb.colliderect(self._pc.collaabb):
             exec collectible.action
+            self._collectibles.remove(collectible)
             if collectible.triumph:
               self._pc.x = collectible.x-(collectible.x%8)
               self._pc.y = collectible.y+(-collectible.y%8)
