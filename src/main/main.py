@@ -560,16 +560,17 @@ class Play(object):
                 self._pc.dx = -speed
               if monster.direction == Direction.RIGHT:
                 self._pc.dx = speed
-
+        removes = []
         for collectible in self._collectibles:
           if collectible.aabb.colliderect(self._pc.collaabb):
             exec collectible.action
-            self._collectibles.remove(collectible)
+            removes.append(collectible)
             if collectible.triumph:
               self._pc.x = collectible.x-(collectible.x%8)
               self._pc.y = collectible.y+(-collectible.y%8)
               self._pc.triumph(48)
               self._temps.append([Tile.Tile(self._pc.x,self._pc.y-16,collectible.sprite,size=1),48])
+        self._collectibles = [c for c in self._collectibles if c not in removes]
     elif self._zoning is not None:
       self._pc.incframe()
       if self._zoning == Direction.UP:
