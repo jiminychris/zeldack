@@ -11,16 +11,29 @@ class Tile(object):
     self._condition = 'True'
     self._portal = portal
     self._mask = mask
+    self._alt = None
+    self._action = None
     if aabbs is None:
       aabbs = ()
     self._aabbs = aabbs
 
   def addcond(self, cond):
     self._condition = cond
+  def addaction(self, action):
+    self._action = action
+  def addalt(self, alt):
+    self._alt = alt
     
   @property
   def condition(self):
     return self._condition
+  @property
+  def action(self):
+    return self._action
+  @property
+  def alt(self):
+    return self._alt
+    
   @property
   def x(self):
     return self._x

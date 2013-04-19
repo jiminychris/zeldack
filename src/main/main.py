@@ -14,6 +14,8 @@ import Text
   
 class Play(object):
   def __init__(self):
+    self._cache = []
+    self._deathanims = []
     self._debugging = False
     if '-aabbdebug' in sys.argv:
       self._debugging = True
@@ -133,6 +135,9 @@ class Play(object):
   @property
   def _tiles(self):
     return self._currentmap.tiles
+  @_tiles.setter
+  def _tiles(self, value):
+    self._currentmap.tiles = value
   @property
   def _monsters(self):
     return self._currentmap.monsters
@@ -171,6 +176,7 @@ class Play(object):
     self._maps = {k: v for k, v in self._maps.items() if k in self._maphistory}
     g = globals()
     l = locals()
+    self._tiles = [tile if eval(tile.condition) else tile.alt for tile in self._tiles]
     self._maskedTiles = [tile for tile in self._tiles if tile.mask]
     self._unmaskedTiles = [tile for tile in self._tiles if not tile.mask]
     self._collectibles = [coll for coll in self._collectibles if eval(coll.condition,g,l)]
@@ -214,6 +220,15 @@ class Play(object):
     deads = [monster for monster in self._monsters if monster.hp == 0]
     self._monsters = [monster for monster in self._monsters if monster.hp > 0]
     for monster in deads:
+      self._deathanims.append(type('DeathAnim', (), {'x': monster.x, 'y': monster.y, 't': 8}))
+    
+  @property
+  def _porting(self):
+    return self._spelunking != 0 or self._zoning != None
+    
+  def _timers(self):
+    drops = [d for d in self._deathanims if d.t == 0]
+    for d in drops:
       roll = random.randint(1,20)
       if roll > 10 and roll < 15:
         c = self._getHeartCollectible()
@@ -227,15 +242,13 @@ class Play(object):
       else:
         c = None
       if c is not None:
-        c.x = monster.x
-        c.y = monster.y
+        c.x = d.x
+        c.y = d.y
         self._collectibles.append(c)
-    
-  @property
-  def _porting(self):
-    return self._spelunking != 0 or self._zoning != None
-    
-  def _timers(self):
+    self._deathanims = [d for d in self._deathanims if d > 0]
+    for d in self._deathanims:
+      d.t -= 1
+        
     for temp in self._temps:
       temp[1] -= 1
     self._temps = [[s,t] for [s,t] in self._temps if t > 0]
@@ -511,10 +524,12 @@ class Play(object):
           elif self._portals[d] is not None:
             self._zone(d)
         else:
+          colls = []
           actor.x += actor.dx
           for tile in self._tiles:
             for wall in tile.aabbs:
               if actor.collaabb.colliderect(wall):
+                colls.append(tile)
                 if actor.dx < 0:
                   actor.x = wall.x+wall.w-actor.collxoffset
                 else:
@@ -523,6 +538,7 @@ class Play(object):
           for tile in self._tiles:
             for wall in tile.aabbs:
               if actor.collaabb.colliderect(wall):
+                colls.append(tile)
                 if actor.dy < 0:
                   actor.y = wall.y+wall.h-actor.collyoffset
                 else:
@@ -533,6 +549,10 @@ class Play(object):
                     self._currentport = tile.portal
                     self._cavetimer = 47
                     self._pc.loseControl(47)
+          for tile in colls:
+            for wall in tile.aabbs:
+              if actor is self._pc and tile.action is not None:
+                exec tile.action
       if not self._porting:          
         for monster in self._monsters:
           for weapon in self._pcweapons:

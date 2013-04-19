@@ -56,10 +56,23 @@ class Parser(object):
     for j in range(len(rows)):
       tiles = rows[j].findall('tile')
       for i in range(len(tiles)):
-        t = tiles[i].get('type', 'blank')
-        p = _tryparseport(tiles[i])
-        tilelist.append(Tile.Tile(i*Tile.SIZE, j*Tile.SIZE, colorReplace(self._tiledefs[t], zip(Parser._DEFAULTCOLORS, self._palettedefs[tiles[i].get('palette', 'default')])), self._aabbdefs[t], p, eval(tiles[i].get('mask', 'False'))))
+        tilelist.append(self._parsetile(tiles[i], i, j))
     return tilelist
+    
+  def _parsetile(self, tile, i, j):
+    t = tile.get('type', 'blank')
+    p = _tryparseport(tile)
+    alt = tile.find('alt')
+    action = tile.find('action')
+    tile = Tile.Tile(i*Tile.SIZE, j*Tile.SIZE, colorReplace(self._tiledefs[t], zip(Parser._DEFAULTCOLORS, self._palettedefs[tile.get('palette', 'default')])), self._aabbdefs[t], p, eval(tile.get('mask', 'False')))
+    
+    if alt is not None:    
+      tile.addcond(alt.find('condition').text)
+      tile.addalt(self._parsetile(alt.find('tile'), i, j))
+    if action is not None:
+      tile.addaction(action.text)
+      
+    return tile
     
   def parseMonsters(self):
     monsterlist = []
@@ -169,25 +182,66 @@ class Parser(object):
         raise ValueError('could not find collectible with id \''+id+'\' in '+str(colroot))
       triumph = eval(c.get('triumph', 'False'))
       action = c.find('action')
+      action2 = collectible.find('action')
       cond = collectible.find('condition')
       aabb = _parserect(c.find('rect'))
       spriten = c.find('sprites')
       ck = _parsecolor(spriten.find('colorkey').find('color'))
-      repl = zip(Parser._DEFAULTCOLORS,_parsecolors(spriten.find('palette')))
+      palette = _parsecolors(spriten.find('palette'))
       sfile = spriten.get('file','weapons.bmp')
       css = Spritesheet(bmpres(sfile))
-      sprites = [colorReplace(_parsesprite(sp, css, ck),repl) for sp in spriten.findall('sprite')]
+      sprites = []
+      for sp in spriten.findall('sprite'):
+        pal = sp.find('palette')
+        if pal is not None:
+          pal = _parsecolors(pal)
+        else:
+          pal = palette
+        repl = zip(Parser._DEFAULTCOLORS, pal)
+        sprites.append(colorReplace(_parsesprite(sp, css, ck), repl))
       if action is None:
         action = ''
       else:
-        action = action.text
+        action = action.text      
+      if action2 is None:
+        action2 = ''
+      else:
+        action2 = action2.text
+      action = '\n'.join((action2, action))
       if cond is None:
-        cond = True
+        cond = 'True'
       else:
         cond = cond.text
       x,y = int(collectible.get('x','0')),int(collectible.get('y','0'))
       collist.append(Collectible(x,y,aabb,sprites,cond,action,triumph))
     return collist
+  
+def parseCollectible(fname, id):
+  c = _safeopen(fname).getroot().find(id, 'heart')
+  triumph = eval(c.get('triumph', 'False'))
+  action = c.find('action')
+  cond = "True"
+  aabb = _parserect(c.find('rect'))
+  spriten = c.find('sprites')
+  ck = _parsecolor(spriten.find('colorkey').find('color'))
+  palette = _parsecolors(spriten.find('palette'))
+  sfile = spriten.get('file','weapons.bmp')
+  css = Spritesheet(bmpres(sfile))
+  sprites = []
+  for sp in spriten.findall('sprite'):
+    pal = sp.find('palette')
+    if pal is not None:
+      pal = _parsecolors(pal)
+    else:
+      pal = palette
+    repl = zip(Parser._DEFAULTCOLORS, pal)
+    sprites.append(colorReplace(_parsesprite(sp, css, ck), repl))
+  if action is None:
+    action = ''
+  else:
+    action = action.text
+  x,y = 0,0
+  return Collectible(x,y,aabb,sprites,cond,action,triumph)
     
 def _sprites(node):
   s = node.find('sprites')
@@ -216,25 +270,6 @@ def _sprites(node):
       sd[dir] = imgs if repl is None else [colorReplace(img, repl) for img in imgs]
       
   return sd
-  
-def parseCollectible(fname, id):
-  c = _safeopen(fname).getroot().find(id, 'heart')
-  triumph = eval(c.get('triumph', 'False'))
-  action = c.find('action')
-  cond = "True"
-  aabb = _parserect(c.find('rect'))
-  spriten = c.find('sprites')
-  ck = _parsecolor(spriten.find('colorkey').find('color'))
-  repl = zip(Parser._DEFAULTCOLORS,_parsecolors(spriten.find('palette')))
-  sfile = spriten.get('file','weapons.bmp')
-  css = Spritesheet(bmpres(sfile))
-  sprites = [colorReplace(_parsesprite(sp, css, ck),repl) for sp in spriten.findall('sprite')]
-  if action is None:
-    action = ''
-  else:
-    action = action.text
-  x,y = 0,0
-  return Collectible(x,y,aabb,sprites,cond,action,triumph)
     
 def _parsecolor(node):
   return (int(node.get('r', '0')), int(node.get('g', '0')), int(node.get('b', '0')))
@@ -277,7 +312,6 @@ def _parseline(node):
   tiles = []
   for i in range(len(txt)):
     tiles.append(Tile.Tile((x+i*8), y, txt[i]))
-    print tiles[-1].x, tiles[-1].y
   return tiles
   
 def _safeopen(fname):

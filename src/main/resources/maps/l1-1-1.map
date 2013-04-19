@@ -4,21 +4,19 @@
       <portal file="l1-1-2.map" />
     </right>
   </portals>
+  <collectibles file="collectibles.col">
+    <collectible id="key" x="164" y="129">
+      <condition>"key-l1-1-2" not in self._cache</condition>
+      <action>self._cache.append("key-l1-1-2")</action>
+    </collectible>
+  </collectibles>
   <tiles file="uwtiles.til">
-    <palettes>
-      <palette id="default">
-        <color r="0" g="0" b="0" />
-        <color r="0" g="128" b="136" />
-        <color r="24" g="60" b="92" />
-        <color r="0" g="232" b="216" />
-      </palette>
-      <palette id="statue">
-        <color r="0" g="0" b="0" />
-        <color r="0" g="128" b="136" />
-        <color r="32" g="56" b="236" />
-        <color r="0" g="232" b="216" />
-      </palette>
-    </palettes>
+    <palette>
+      <color r="0" g="0" b="0" />
+      <color r="0" g="128" b="136" />
+      <color r="24" g="60" b="92" />
+      <color r="0" g="232" b="216" />
+    </palette>
     <row>
       <tile type="top-left-ceil" />
       <tile type="top-wall-ceil" />

@@ -1,8 +1,11 @@
 <map>
   <portals>
-    <left>
+    <up>
+      <portal file="l1-3-2.map" />
+    </up>
+    <down>
       <portal file="l1-1-2.map" />
-    </left>
+    </down>
   </portals>
   <tiles file="uwtiles.til">
     <palette>
@@ -19,8 +22,8 @@
       <tile type="top-wall-ceil" />
       <tile type="top-wall-ceil-2" />
       <tile type="top-wall-ceil-3" />
-      <tile type="top-wall-ceil" />
-      <tile type="top-wall-ceil" />
+      <tile type="top-door-ceil-1" mask="True" />
+      <tile type="top-door-ceil-2" mask="True" />
       <tile type="top-wall-ceil-4" />
       <tile type="top-wall-ceil-5" />
       <tile type="top-wall-ceil" />
@@ -37,8 +40,8 @@
       <tile type="top-wall-floor-3" />
       <tile type="top-wall-floor-4" />
       <tile type="top-wall-floor-5" />
-      <tile type="top-wall-floor" />
-      <tile type="top-wall-floor" />
+      <tile type="top-door-floor-1" />
+      <tile type="top-door-floor-2" />
       <tile type="top-wall-floor-6" />
       <tile type="top-wall-floor-7" />
       <tile type="top-wall-floor-8" />
@@ -84,54 +87,54 @@
       <tile type="right-wall-ceil-1" />
     </row>
     <row>
-      <tile type="left-door-ceil-1" />
-      <tile type="left-door-floor-1" />
+      <tile type="left-wall-ceil-2" />
+      <tile type="left-wall-floor-3" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="block" />
-      <tile type="block" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="block" />
       <tile type="block" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="right-wall-floor-3" />
       <tile type="right-wall-ceil-2" />
     </row>
     <row>
-      <tile type="left-door-ceil-2" mask="True" />
-      <tile type="left-door-floor-2" />
+      <tile type="left-wall-ceil" mask="True" />
+      <tile type="left-wall-floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="block" />
-      <tile type="block" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="block" />
       <tile type="block" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="right-wall-floor" />
-      <tile type="right-wall-ceil" />
+      <tile type="right-wall-ceil" mask="True" />
     </row>
     <row>
-      <tile type="left-door-ceil-3" />
-      <tile type="left-door-floor-3" />
+      <tile type="left-wall-ceil-3" />
+      <tile type="left-wall-floor-4" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="block" />
-      <tile type="block" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="block" />
       <tile type="block" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="right-wall-floor-4" />
@@ -181,8 +184,30 @@
       <tile type="bottom-wall-floor-3" />
       <tile type="bottom-wall-floor-4" />
       <tile type="bottom-wall-floor-5" />
-      <tile type="bottom-wall-floor" />
-      <tile type="bottom-wall-floor" />
+      <tile type="bottom-lock-1">
+        <alt>
+          <condition>'lock-l1/1-2=2-1' not in self._cache</condition>
+          <tile type="bottom-door-floor-1" />
+        </alt>
+        <action>
+if self._inventory.keys > 0:
+  self._inventory.removekey()
+  self._cache.append('lock-l1/1-2=2-1')
+  self._loadmap(self._currentmapname)
+        </action>
+      </tile>
+      <tile type="bottom-lock-2">
+        <alt>
+          <condition>'lock-l1/1-2=2-1' not in self._cache</condition>
+          <tile type="bottom-door-floor-2" />
+        </alt>
+        <action>
+if self._inventory.keys > 0:
+  self._inventory.removekey()
+  self._cache.append('lock-l1/1-2=2-1')
+  self._loadmap(self._currentmapname)
+        </action>
+      </tile>
       <tile type="bottom-wall-floor-6" />
       <tile type="bottom-wall-floor-7" />
       <tile type="bottom-wall-floor-8" />
@@ -199,8 +224,8 @@
       <tile type="bottom-wall-ceil" />
       <tile type="bottom-wall-ceil-2" />
       <tile type="bottom-wall-ceil-3" />
-      <tile type="bottom-wall-ceil" />
-      <tile type="bottom-wall-ceil" />
+      <tile type="bottom-door-ceil-1" mask="True" />
+      <tile type="bottom-door-ceil-2" mask="True" />
       <tile type="bottom-wall-ceil-4" />
       <tile type="bottom-wall-ceil-5" />
       <tile type="bottom-wall-ceil" />

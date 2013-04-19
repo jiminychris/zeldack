@@ -1,5 +1,8 @@
 <map>
   <portals>
+    <up>
+      <portal file="l1-2-1.map" />
+    </up>
     <right>
       <portal file="l1-1-3.map" />
     </right>
@@ -51,8 +54,30 @@
       <tile type="top-wall-floor-3" />
       <tile type="top-wall-floor-4" />
       <tile type="top-wall-floor-5" />
-      <tile type="top-lock-1" />
-      <tile type="top-lock-2" />
+      <tile type="top-lock-1">
+        <alt>
+          <condition>'lock-l1/1-2=2-1' not in self._cache</condition>
+          <tile type="top-door-floor-1" />
+        </alt>
+        <action>
+if self._inventory.keys > 0:
+  self._inventory.removekey()
+  self._cache.append('lock-l1/1-2=2-1')
+  self._loadmap(self._currentmapname)
+        </action>
+      </tile>
+      <tile type="top-lock-2">
+        <alt>
+          <condition>'lock-l1/1-2=2-1' not in self._cache</condition>
+          <tile type="top-door-floor-2" />
+        </alt>
+        <action>
+if self._inventory.keys > 0:
+  self._inventory.removekey()
+  self._cache.append('lock-l1/1-2=2-1')
+  self._loadmap(self._currentmapname)
+        </action>
+      </tile>
       <tile type="top-wall-floor-6" />
       <tile type="top-wall-floor-7" />
       <tile type="top-wall-floor-8" />
