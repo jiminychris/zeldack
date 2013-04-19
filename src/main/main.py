@@ -8,7 +8,7 @@ from Actor import Actor
 from Inventory import Inventory
 from Utils import *
 from Spritesheet import Spritesheet
-from Portal import Portal
+from Portal import Portal, PortalType
 import random
 import Text
   
@@ -42,7 +42,6 @@ class Play(object):
     self._vaabb = pygame.Rect(2, Tile.HALF, Tile.SIZE-4, Tile.HALF)
     self._spelunking = 0
     self._zoning = None
-    self._incave = False
     
     self._zoom = 2
     pygame.init()
@@ -94,7 +93,7 @@ class Play(object):
     
     self._pcweapons = []
     self._temps = []
-    self._startport = Portal(self._startmap, 15*8, 10*8)
+    self._startport = Portal(self._startmap, 15*8, 10*8, PortalType.Magic)
     self._start()
     
   def _getHeartCollectible(self):
@@ -172,6 +171,8 @@ class Play(object):
     self._maps = {k: v for k, v in self._maps.items() if k in self._maphistory}
     g = globals()
     l = locals()
+    self._maskedTiles = [tile for tile in self._tiles if tile.mask]
+    self._unmaskedTiles = [tile for tile in self._tiles if not tile.mask]
     self._collectibles = [coll for coll in self._collectibles if eval(coll.condition,g,l)]
     self._textlist = [text for text in self._textlist if eval(text.condition,g,l)]
     self._texttimer = 0
@@ -256,7 +257,6 @@ class Play(object):
       else:
         self._spelunking = 0
         if s == -1:
-          self._incave = True
           self._port(self._currentport)
     
   def _update(self):
@@ -299,13 +299,17 @@ class Play(object):
         dxn = -4*self._zonetimer
         dyo = 0
         dyn = 0
-      for tile in self._tiles:
+      for tile in self._unmaskedTiles:
         self._screen.blit(self._getzoom(tile.img), ((tile.x+dxn)*self._zoom, (tile.y+dyn+self._OFFSET)*self._zoom))
-      for tile in self._oldmap.tiles:
+      for tile in [tile for tile in self._oldmap.tiles if not tile.mask]:
         self._screen.blit(self._getzoom(tile.img), ((tile.x+dxo)*self._zoom, (tile.y+dyo+self._OFFSET)*self._zoom))
       self._screen.blit(self._getzoom(self._pc.sprite), ((self._pc.x)*self._zoom, (self._pc.y+self._OFFSET)*self._zoom))
+      for tile in self._maskedTiles:
+        self._screen.blit(self._getzoom(tile.img), ((tile.x+dxn)*self._zoom, (tile.y+dyn+self._OFFSET)*self._zoom))
+      for tile in [tile for tile in self._oldmap.tiles if tile.mask]:
+        self._screen.blit(self._getzoom(tile.img), ((tile.x+dxo)*self._zoom, (tile.y+dyo+self._OFFSET)*self._zoom))
     else:
-      for tile in self._tiles:
+      for tile in self._unmaskedTiles:
         self._screen.blit(self._getzoom(tile.img), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
       for deco in self._decos:
         self._screen.blit(self._getzoom(deco.sprite), (deco.x*self._zoom, (deco.y+self._OFFSET)*self._zoom))   
@@ -319,6 +323,8 @@ class Play(object):
         self._screen.blit(self._getzoom(actor.sprite), ((actor.x)*self._zoom, (actor.y+self._OFFSET)*self._zoom))
       for [s,t] in self._temps:
         self._screen.blit(self._getzoom(s.img), ((s.x)*self._zoom, (s.y+self._OFFSET)*self._zoom))
+      for tile in self._maskedTiles:
+        self._screen.blit(self._getzoom(tile.img), ((tile.x)*self._zoom, (tile.y+self._OFFSET)*self._zoom))
       
     self._renderui()
     
@@ -496,10 +502,9 @@ class Play(object):
         if actor.collaabb.colliderect(self._LBOUND):
           d = Direction.LEFT
           actor.x = self._LBOUND.x+self._LBOUND.w-actor.collxoffset
-        if d is not None and actor is self._pc:
-          if self._incave:
+        if d is not None and self._portals[d] is not None and actor is self._pc:
+          if self._portals[d].type == PortalType.CaveExit:
             self._spelunking = 1
-            self._incave = False
             self._cavetimer = 47
             self._pc.loseControl(47)
             self._port(self._portals[d])
@@ -508,7 +513,7 @@ class Play(object):
         else:
           actor.x += actor.dx
           for tile in self._tiles:
-            for wall in tile.AABBs:
+            for wall in tile.aabbs:
               if actor.collaabb.colliderect(wall):
                 if actor.dx < 0:
                   actor.x = wall.x+wall.w-actor.collxoffset
@@ -516,17 +521,18 @@ class Play(object):
                   actor.x = wall.x-actor.collaabb.w-actor.collxoffset
           actor.y += actor.dy
           for tile in self._tiles:
-            for wall in tile.AABBs:
+            for wall in tile.aabbs:
               if actor.collaabb.colliderect(wall):
                 if actor.dy < 0:
                   actor.y = wall.y+wall.h-actor.collyoffset
                 else:
                   actor.y = wall.y-actor.collaabb.h-actor.collyoffset
                 if actor is self._pc and tile.isPortal:
-                  self._spelunking = -1
-                  self._currentport = tile.portal
-                  self._cavetimer = 47
-                  self._pc.loseControl(47)
+                  if tile.portal.type == PortalType.CaveEntrance:
+                    self._spelunking = -1
+                    self._currentport = tile.portal
+                    self._cavetimer = 47
+                    self._pc.loseControl(47)
       if not self._porting:          
         for monster in self._monsters:
           for weapon in self._pcweapons:
@@ -570,7 +576,7 @@ class Play(object):
                 self._pc.x = collectible.x-(collectible.x%8)
                 self._pc.y = collectible.y+(-collectible.y%8)
                 self._pc.triumph(48)
-                self._temps.append([Tile.Tile(self._pc.x,self._pc.y-16,collectible.sprite,size=1),48])
+                self._temps.append([Tile.Tile(self._pc.x,self._pc.y-16,collectible.sprite),48])
           self._collectibles = [c for c in self._collectibles if c not in removes]
     elif self._zoning is not None:
       self._pc.incframe()

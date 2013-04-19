@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as et
 import Tile
-from Portal import Portal
+from Portal import Portal, PortalType
 from Collectible import Collectible
 import Text
 from pygame.rect import Rect
@@ -58,7 +58,7 @@ class Parser(object):
       for i in range(len(tiles)):
         t = tiles[i].get('type', 'blank')
         p = _tryparseport(tiles[i])
-        tilelist.append(Tile.Tile(i, j, colorReplace(self._tiledefs[t], zip(Parser._DEFAULTCOLORS, self._palettedefs[tiles[i].get('palette', 'default')])), self._aabbdefs[t], p))
+        tilelist.append(Tile.Tile(i*Tile.SIZE, j*Tile.SIZE, colorReplace(self._tiledefs[t], zip(Parser._DEFAULTCOLORS, self._palettedefs[tiles[i].get('palette', 'default')])), self._aabbdefs[t], p, eval(tiles[i].get('mask', 'False'))))
     return tilelist
     
   def parseMonsters(self):
@@ -245,6 +245,10 @@ def _parsesprite(node, ss, ck=None):
   trans = node.get('transform', 'default')
   if trans == 'fliph':
     sp = pygame.transform.flip(sp, True, False)
+  elif trans == 'flipv':
+    sp = pygame.transform.flip(sp, False, True)
+  elif trans == 'flip':
+    sp = pygame.transform.flip(sp, True, True)
   return sp
 def _parsesprites(node, ss):
   return [_parsesprite(s, ss, _tryparsecolorkey(node)) for s in node.findall('sprite')]
@@ -257,7 +261,7 @@ def _tryparseport(node):
     return node
   port = node.find('portal')
   if port is not None:
-    port = Portal(port.get('file', 'swordcave.map'), int(port.get('x', '0')), int(port.get('y', '0')))
+    port = Portal(port.get('file', 'swordcave.map'), int(port.get('x', '0')), int(port.get('y', '0')), PortalType.__dict__[port.get('type', 'Boundary')])
   return port
 def _tryparsecolorkey(node):
   if node is None:
@@ -272,7 +276,8 @@ def _parseline(node):
   txt = Text.get(node.get('value', ''))
   tiles = []
   for i in range(len(txt)):
-    tiles.append(Tile.Tile(x+i*8, y, txt[i], size=1))
+    tiles.append(Tile.Tile((x+i*8), y, txt[i]))
+    print tiles[-1].x, tiles[-1].y
   return tiles
   
 def _safeopen(fname):

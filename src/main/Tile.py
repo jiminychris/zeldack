@@ -4,17 +4,16 @@ SIZE = 16
 HALF = SIZE/2
 
 class Tile(object):
-  def __init__(self, x, y, img, AABBs=None, portal=None, size=None):
-    if size is None:
-      size = SIZE
-    self._x = x * size
-    self._y = y * size
+  def __init__(self, x, y, img, aabbs=None, portal=None, mask=False):
+    self._x = x
+    self._y = y
     self._img = img
     self._condition = 'True'
     self._portal = portal
-    if AABBs is None:
-      AABBs = ()
-    self._AABBs = map(lambda x: pygame.Rect(x.x*HALF+self._x, x.y*HALF+self._y, x.w*HALF, x.h*HALF), AABBs)
+    self._mask = mask
+    if aabbs is None:
+      aabbs = ()
+    self._aabbs = aabbs
 
   def addcond(self, cond):
     self._condition = cond
@@ -43,5 +42,9 @@ class Tile(object):
     return self._img
   
   @property
-  def AABBs(self):
-    return map(lambda x: pygame.Rect(x), self._AABBs)
+  def aabbs(self):
+    return [pygame.Rect(aabb.x+self._x, aabb.y+self._y, aabb.w, aabb.h) for aabb in self._aabbs]
+    
+  @property
+  def mask(self):
+    return self._mask

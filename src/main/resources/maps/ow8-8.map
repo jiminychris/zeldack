@@ -41,7 +41,7 @@
       <tile type="wall" />
       <tile type="wall" />
       <tile type="door">
-        <portal file="swordcave.map" x="112" y="152" />
+        <portal file="swordcave.map" x="112" y="152" type="CaveEntrance"/>
       </tile>
       <tile type="wall" />
       <tile type="top-left-corner" />

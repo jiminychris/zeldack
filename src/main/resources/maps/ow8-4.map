@@ -91,7 +91,9 @@
       <tile type="bottom-right-tree" />
       <tile type="floor" />
       <tile type="bottom-left-tree" />
-      <tile type="door" />
+      <tile type="door">
+        <portal file="l1-1-2.map" x="120" y="152" type="CaveEntrance"/>
+      </tile>
       <tile type="bottom-right-tree" />
       <tile type="floor" />
       <tile type="bottom-left-tree" />

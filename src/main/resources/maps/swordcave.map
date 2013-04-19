@@ -11,7 +11,7 @@
   </collectibles>
   <portals>
     <down>
-      <portal file="ow8-8.map" x="64" y="32" />
+      <portal file="ow8-8.map" x="64" y="32" type="CaveExit"/>
     </down>
   </portals>
   <tiles file="tiles.til">
