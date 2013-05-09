@@ -13,7 +13,13 @@ class Inventory(object):
     return self._bombs
   @property
   def keys(self):
-    return self._keys
+    if self._keys != 'A':
+      return self._keys
+    else:
+      return 8
+  @property
+  def keystr(self):
+    return str(self._keys)
   @property
   def sword(self):
     return self._sword

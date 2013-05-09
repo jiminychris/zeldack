@@ -1,13 +1,16 @@
 <map>
   <portals>
-    <left>
-      <portal file="l1-1-2.map" />
-    </left>
+    <right>
+      <portal file="l1-5-3.map" />
+    </right>
+    <down>
+      <portal file="l1-4-5.map" />
+    </down>
   </portals>
-  <collectibles file="collectibles.col">
-    <collectible id="key" x="84" y="113">
-      <condition>"key-l1-1-3" not in self._cache</condition>
-      <action>self._cache.append("key-l1-1-3")</action>
+  <collectibles>
+    <collectible id="heart-container" x="192" y="80">
+      <condition>"l1-heart" not in self._cache</condition>
+      <action>self._cache.append("l1-heart")</action>
     </collectible>
   </collectibles>
   <tiles file="uwtiles.til">
@@ -25,8 +28,8 @@
       <tile type="top-wall-ceil" />
       <tile type="top-wall-ceil-2" />
       <tile type="top-wall-ceil-3" />
-      <tile type="top-wall-ceil" />
-      <tile type="top-wall-ceil" />
+      <tile type="top-wall-ceil" mask="True" />
+      <tile type="top-wall-ceil" mask="True" />
       <tile type="top-wall-ceil-4" />
       <tile type="top-wall-ceil-5" />
       <tile type="top-wall-ceil" />
@@ -63,11 +66,11 @@
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
       <tile type="right-wall-floor-1" />
       <tile type="right-wall-ceil" />
     </row>
@@ -83,65 +86,65 @@
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
       <tile type="right-wall-floor-2" />
       <tile type="right-wall-ceil-1" />
     </row>
     <row>
-      <tile type="left-door-ceil-1" />
-      <tile type="left-door-floor-1" />
+      <tile type="left-wall-ceil-2" />
+      <tile type="left-wall-floor-3" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="block" />
       <tile type="block" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="block" />
-      <tile type="block" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="right-wall-floor-3" />
-      <tile type="right-wall-ceil-2" />
+      <tile type="right-door-floor-1" />
+      <tile type="right-door-ceil-1" />
     </row>
     <row>
-      <tile type="left-door-ceil-2" mask="True" />
-      <tile type="left-door-floor-2" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="block" />
-      <tile type="block" />
+      <tile type="left-wall-ceil" mask="True" />
+      <tile type="left-wall-floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="block" />
-      <tile type="block" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="right-wall-floor" />
-      <tile type="right-wall-ceil" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="horiz-shut" />
+      <tile type="right-door-ceil-2" mask="True" />
     </row>
     <row>
-      <tile type="left-door-ceil-3" />
-      <tile type="left-door-floor-3" />
+      <tile type="left-wall-ceil-3" />
+      <tile type="left-wall-floor-4" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
+      <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
       <tile type="block" />
       <tile type="block" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="block" />
-      <tile type="block" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="right-wall-floor-4" />
-      <tile type="right-wall-ceil-3" />
+      <tile type="right-door-floor-3" />
+      <tile type="right-door-ceil-3" />
     </row>
     <row>
       <tile type="left-wall-ceil-4" />
@@ -155,9 +158,9 @@
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
       <tile type="right-wall-floor-5" />
       <tile type="right-wall-ceil-4" />
     </row>
@@ -171,11 +174,11 @@
       <tile type="floor" />
       <tile type="floor" />
       <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
-      <tile type="floor" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
+      <tile type="block" />
       <tile type="right-wall-floor-6" />
       <tile type="right-wall-ceil" />
     </row>
@@ -187,8 +190,30 @@
       <tile type="bottom-wall-floor-3" />
       <tile type="bottom-wall-floor-4" />
       <tile type="bottom-wall-floor-5" />
-      <tile type="bottom-wall-floor" />
-      <tile type="bottom-wall-floor" />
+      <tile type="bottom-lock-1">
+        <alt>
+          <condition>'lock-l1/4-5=5-2' not in self._cache</condition>
+          <tile type="bottom-door-floor-1" />
+        </alt>
+        <action>
+if self._inventory.keys > 0:
+  self._inventory.removekey()
+  self._cache.append('lock-l1/4-5=5-2')
+  self._loadmap(self._currentmapname)
+        </action>
+      </tile>
+      <tile type="bottom-lock-2">
+        <alt>
+          <condition>'lock-l1/4-5=5-2' not in self._cache</condition>
+          <tile type="bottom-door-floor-2" />
+        </alt>
+        <action>
+if self._inventory.keys > 0:
+  self._inventory.removekey()
+  self._cache.append('lock-l1/4-5=5-2')
+  self._loadmap(self._currentmapname)
+        </action>
+      </tile>
       <tile type="bottom-wall-floor-6" />
       <tile type="bottom-wall-floor-7" />
       <tile type="bottom-wall-floor-8" />
@@ -205,8 +230,8 @@
       <tile type="bottom-wall-ceil" />
       <tile type="bottom-wall-ceil-2" />
       <tile type="bottom-wall-ceil-3" />
-      <tile type="bottom-wall-ceil" />
-      <tile type="bottom-wall-ceil" />
+      <tile type="bottom-door-ceil-1" mask="True" />
+      <tile type="bottom-door-ceil-2" mask="True" />
       <tile type="bottom-wall-ceil-4" />
       <tile type="bottom-wall-ceil-5" />
       <tile type="bottom-wall-ceil" />

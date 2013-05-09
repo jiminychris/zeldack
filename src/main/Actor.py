@@ -135,6 +135,9 @@ class Actor(object):
   def maxhp(self):
     return self._maxhp
     
+  def raiseMaxHP(self, dhp):
+    self._maxhp += dhp
+    
     
   @property
   def x(self):

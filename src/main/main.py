@@ -111,6 +111,8 @@ class Play(object):
     self._maps = {}
     self._maphistory = [self._startmap]
     self._inventory = Inventory()
+    if '-mkey' in sys.argv:
+      self._inventory.acquiremkey()
     if '-sword' in sys.argv:
       self._inventory.changesword(int(sys.argv[sys.argv.index('-sword')+1]))
     self._port(self._startport)
@@ -388,7 +390,7 @@ class Play(object):
     rupees = Text.get(('X' if self._inventory.rupees < 100 else '')+str(self._inventory.rupees))
     for i in range(len(rupees)):
       self._screen.blit(self._getzoom(rupees[i]), ((i+12)*8*self._zoom,(2)*8*self._zoom))
-    keys = Text.get('X'+str(self._inventory.keys))
+    keys = Text.get('X'+self._inventory.keystr)
     for i in range(len(keys)):
       self._screen.blit(self._getzoom(keys[i]), ((i+12)*8*self._zoom,(4)*8*self._zoom))
     bombs = Text.get('X'+str(self._inventory.bombs))

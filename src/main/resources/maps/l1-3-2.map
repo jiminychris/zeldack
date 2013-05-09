@@ -1,8 +1,14 @@
 <map>
   <portals>
+    <right>
+      <portal file="l1-3-3.map" />
+    </right>
     <down>
       <portal file="l1-2-1.map" />
     </down>
+    <left>
+      <portal file="l1-3-1.map" />
+    </left>
   </portals>
   <tiles file="uwtiles.til">
     <palette>

@@ -61,6 +61,24 @@ self._pc.heal(16)
       </sprite>
     </sprites>
   </heart>
+  <heart-container>
+    <action>
+self._pc.raiseMaxHP(16)
+    </action>
+    <rect x="0" y="0" w="16" h="16" />
+    <sprites file="icons.bmp">
+      <palette>
+        <color r="0" g="0" b="0" />
+        <color r="216" g="40" b="0" />
+        <color r="252" g="152" b="56" />
+        <color r="255" g="255" b="255" />
+      </palette>
+      <colorkey>
+        <color r="0" g="0" b="0" />
+      </colorkey>
+      <sprite x="32" y="0" w="16" h="16" />
+    </sprites>
+  </heart-container>
   <rupee>
     <action>
 self._inventory.addrupees(1)

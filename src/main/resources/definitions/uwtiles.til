@@ -2,6 +2,17 @@
   <def type="floor">
     <sprite x="0" y="0" w="16" h="16" />
   </def>
+  <def type="darkfloor">
+    <sprite x="128" y="16" w="16" h="16" />
+  </def>
+  <def type="water">
+    <sprite x="96" y="16" w="16" h="16" />
+    <rect x="0" y="0" w="16" h="16" />
+  </def>
+  <def type="invisiwall">
+    <sprite x="128" y="16" w="16" h="16" />
+    <rect x="0" y="0" w="16" h="16" />
+  </def>
   <def type="sand">
     <sprite x="16" y="0" w="16" h="16" />
   </def>
@@ -387,6 +398,18 @@
   </def>
   <def type="bottom-lock-2">
     <sprite x="96" y="0" w="16" h="16" transform="flipv" />
+    <rect x="0" y="0" w="16" h="16" />
+  </def>
+  <def type="left-lock">
+    <sprite x="128" y="0" w="16" h="16" transform="fliph" />
+    <rect x="0" y="0" w="16" h="16" />
+  </def>
+  <def type="right-lock">
+    <sprite x="128" y="0" w="16" h="16" />
+    <rect x="0" y="0" w="16" h="16" />
+  </def>
+  <def type="horiz-shut">
+    <sprite x="112" y="0" w="16" h="16" />
     <rect x="0" y="0" w="16" h="16" />
   </def>
 </tiles>
